@@ -27,7 +27,6 @@ if [ -n "$THEME" ]; then
         "/opt/muos/browse/SD2 (sdcard)/MUOS/theme/${THEME}/glyph/muxapp"
     )
 
-    # Copie dans chaque dossier cible
     for DIR in "${TARGETS[@]}"; do
         if [ -d "$DIR" ]; then
             cp "$GROUT_ICON_PATH" "$DIR/grout.png"
