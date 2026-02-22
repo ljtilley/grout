@@ -28,4 +28,10 @@ const (
 	ScreenArtworkSync
 	ScreenUpdateCheck
 	ScreenGameFilters
+	ScreenSaveSync
+	ScreenSaveSyncSettings
+	ScreenSaveConflict
+	ScreenSyncMenu
+	ScreenSyncedGames
+	ScreenSyncHistory
 )

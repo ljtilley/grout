@@ -48,12 +48,14 @@ const (
 	SettingAdvancedSettings    SettingType = "advanced_settings"
 	SettingInfo                SettingType = "info"
 	SettingCheckUpdates        SettingType = "check_updates"
+	SettingSaveSync            SettingType = "save_sync"
 )
 
 var settingsOrder = []SettingType{
 	SettingGeneralSettings,
 	SettingCollectionsSettings,
 	SettingDirectoryMappings,
+	SettingSaveSync,
 	SettingAdvancedSettings,
 	SettingInfo,
 	SettingCheckUpdates,
@@ -128,6 +130,11 @@ func (s *SettingsScreen) Draw(input SettingsInput) (SettingsOutput, error) {
 			output.Action = SettingsActionCheckUpdate
 			return output, nil
 		}
+
+		if selectedText == i18n.Localize(&goi18n.Message{ID: "settings_save_sync", Other: "Save Sync"}, nil) {
+			output.Action = SettingsActionSaveSync
+			return output, nil
+		}
 	}
 
 	output.Config = config
@@ -178,6 +185,12 @@ func (s *SettingsScreen) buildMenuItem(settingType SettingType) gaba.ItemWithOpt
 	case SettingCheckUpdates:
 		return gaba.ItemWithOptions{
 			Item:    gaba.MenuItem{Text: i18n.Localize(&goi18n.Message{ID: "update_check_for_updates", Other: "Check for Updates"}, nil)},
+			Options: []gaba.Option{{Type: gaba.OptionTypeClickable}},
+		}
+
+	case SettingSaveSync:
+		return gaba.ItemWithOptions{
+			Item:    gaba.MenuItem{Text: i18n.Localize(&goi18n.Message{ID: "settings_save_sync", Other: "Save Sync"}, nil)},
 			Options: []gaba.Option{{Type: gaba.OptionTypeClickable}},
 		}
 

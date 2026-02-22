@@ -42,13 +42,16 @@ func (s *RebuildCacheScreen) Draw(input RebuildCacheInput) (RebuildCacheOutput, 
 		input.CacheSync.Stop()
 	}
 
-	if err := cache.DeleteCacheFolder(); err != nil {
-		logger.Error("Failed to delete cache folder", "error", err)
-	}
-
-	if err := cache.InitCacheManager(input.Host, input.Config); err != nil {
-		logger.Error("Failed to reinitialize cache manager", "error", err)
-		return RebuildCacheOutput{Action: RebuildCacheActionError}, err
+	cm := cache.GetCacheManager()
+	if cm != nil {
+		if err := cm.Clear(); err != nil {
+			logger.Error("Failed to clear cache", "error", err)
+		}
+	} else {
+		if err := cache.InitCacheManager(input.Host, input.Config); err != nil {
+			logger.Error("Failed to reinitialize cache manager", "error", err)
+			return RebuildCacheOutput{Action: RebuildCacheActionError}, err
+		}
 	}
 
 	platforms, err := internal.GetMappedPlatforms(input.Host, input.Config.DirectoryMappings, input.Config.ApiTimeout)
@@ -59,7 +62,7 @@ func (s *RebuildCacheScreen) Draw(input RebuildCacheInput) (RebuildCacheOutput, 
 
 	platforms = internal.SortPlatformsByOrder(platforms, input.Config.PlatformOrder)
 
-	cm := cache.GetCacheManager()
+	cm = cache.GetCacheManager()
 	progress := uatomic.NewFloat64(0)
 	gaba.ProcessMessage(
 		i18n.Localize(&goi18n.Message{ID: "cache_building", Other: "Building cache..."}, nil),

@@ -72,6 +72,16 @@ func buildTransitionFunc(state *AppState, quitOnBack bool, initialShowCollection
 			return transitionUpdateCheck(ctx, result)
 		case ScreenGameFilters:
 			return transitionGameFilters(ctx, result)
+		case ScreenSaveSync:
+			return popOrExit(stack)
+		case ScreenSyncMenu:
+			return transitionSyncMenu(ctx, result)
+		case ScreenSyncedGames:
+			return popOrExit(stack)
+		case ScreenSyncHistory:
+			return popOrExit(stack)
+		case ScreenSaveSyncSettings:
+			return transitionSaveSyncSettings(ctx, result)
 		}
 
 		return router.ScreenExit, nil
@@ -89,6 +99,7 @@ func transitionPlatformSelection(ctx *transitionContext, result any) (router.Scr
 		Platforms:       &ctx.state.Platforms,
 		QuitOnBack:      ctx.quitOnBack,
 		ShowCollections: ctx.showCollections,
+		ShowSaveSync:    ctx.state.Host.DeviceID != "",
 	}
 
 	switch r.Action {
@@ -115,11 +126,66 @@ func transitionPlatformSelection(ctx *transitionContext, result any) (router.Scr
 			Host:   ctx.state.Host,
 		}
 
+	case ui.PlatformSelectionActionSaveSync:
+		ctx.stack.Push(ScreenPlatformSelection, pushInput, r)
+		return ScreenSyncMenu, ui.SyncMenuInput{
+			Config: ctx.state.Config,
+			Host:   ctx.state.Host,
+		}
+
 	case ui.PlatformSelectionActionQuit:
 		return router.ScreenExit, nil
 	}
 
 	return router.ScreenExit, nil
+}
+
+func transitionSyncMenu(ctx *transitionContext, result any) (router.Screen, any) {
+	r := result.(ui.SyncMenuOutput)
+
+	pushInput := ui.SyncMenuInput{
+		Config: ctx.state.Config,
+		Host:   ctx.state.Host,
+	}
+
+	switch r.Action {
+	case ui.SyncMenuActionSyncNow:
+		ctx.stack.Push(ScreenSyncMenu, pushInput, r)
+		return ScreenSaveSync, ui.SaveSyncInput{
+			Config: ctx.state.Config,
+			Host:   ctx.state.Host,
+		}
+
+	case ui.SyncMenuActionSyncedGames:
+		ctx.stack.Push(ScreenSyncMenu, pushInput, r)
+		return ScreenSyncedGames, ui.SyncedGamesInput{
+			Config:    ctx.state.Config,
+			Host:      ctx.state.Host,
+			Platforms: &ctx.state.Platforms,
+			DeviceID:  ctx.state.Host.DeviceID,
+		}
+
+	case ui.SyncMenuActionHistory:
+		ctx.stack.Push(ScreenSyncMenu, pushInput, r)
+		return ScreenSyncHistory, ui.SyncHistoryInput{
+			DeviceID: ctx.state.Host.DeviceID,
+		}
+
+	case ui.SyncMenuActionBack:
+		return popOrExit(ctx.stack)
+	}
+
+	return router.ScreenExit, nil
+}
+
+func transitionSaveSyncSettings(ctx *transitionContext, result any) (router.Screen, any) {
+	r := result.(ui.SaveSyncSettingsOutput)
+	if r.Host.DeviceID != "" && r.Host.DeviceID != ctx.state.Host.DeviceID {
+		ctx.state.Host.DeviceID = r.Host.DeviceID
+		ctx.state.Config.Hosts[0] = ctx.state.Host
+		internal.SaveConfig(ctx.state.Config)
+	}
+	return popOrExit(ctx.stack)
 }
 
 func transitionGameList(ctx *transitionContext, result any) (router.Screen, any) {
@@ -443,8 +509,15 @@ func transitionSettings(ctx *transitionContext, result any) (router.Screen, any)
 			Host:           &ctx.state.Host,
 		}
 
+	case ui.SettingsActionSaveSync:
+		ctx.stack.Push(ScreenSettings, pushInput, r)
+		return ScreenSaveSyncSettings, ui.SaveSyncSettingsInput{
+			Config: ctx.state.Config,
+			Host:   ctx.state.Host,
+		}
+
 	case ui.SettingsActionSaved, ui.SettingsActionBack:
-		return popOrExitWithCollections(ctx.stack, ctx.showCollections)
+		return popOrExitWithCollections(ctx.stack, ctx.showCollections, ctx.state.Host.DeviceID != "")
 	}
 
 	return router.ScreenExit, nil
@@ -547,6 +620,7 @@ func transitionLogoutConfirmation(ctx *transitionContext, result any) (router.Sc
 			Platforms:       &ctx.state.Platforms,
 			QuitOnBack:      ctx.quitOnBack,
 			ShowCollections: ctx.state.Config.ShowCollections(ctx.state.Host),
+			ShowSaveSync:    ctx.state.Host.DeviceID != "",
 		}
 	}
 	return popOrExit(ctx.stack)
@@ -610,10 +684,13 @@ func transitionGameFilters(ctx *transitionContext, result any) (router.Screen, a
 	return popOrExit(ctx.stack)
 }
 
-func popOrExitWithCollections(stack *router.Stack, showCollections bool) (router.Screen, any) {
+func popOrExitWithCollections(stack *router.Stack, showCollections bool, showSaveSync ...bool) (router.Screen, any) {
 	screen, input := popOrExit(stack)
 	if psInput, ok := input.(ui.PlatformSelectionInput); ok {
 		psInput.ShowCollections = showCollections
+		if len(showSaveSync) > 0 {
+			psInput.ShowSaveSync = showSaveSync[0]
+		}
 		return screen, psInput
 	}
 	return screen, input
@@ -669,6 +746,14 @@ func popOrExit(stack *router.Stack) (router.Screen, any) {
 	case ui.AdvancedSettingsInput:
 		if entry.Resume != nil {
 			output := entry.Resume.(ui.AdvancedSettingsOutput)
+			input.LastSelectedIndex = output.LastSelectedIndex
+			input.LastVisibleStartIndex = output.LastVisibleStartIndex
+		}
+		return entry.Screen, input
+
+	case ui.SyncMenuInput:
+		if entry.Resume != nil {
+			output := entry.Resume.(ui.SyncMenuOutput)
 			input.LastSelectedIndex = output.LastSelectedIndex
 			input.LastVisibleStartIndex = output.LastVisibleStartIndex
 		}

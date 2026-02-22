@@ -15,6 +15,7 @@ type PlatformSelectionInput struct {
 	Platforms            *[]romm.Platform // Pointer to allow dynamic updates from state
 	QuitOnBack           bool
 	ShowCollections      bool
+	ShowSaveSync         bool
 	LastSelectedIndex    int
 	LastSelectedPosition int
 }
@@ -74,6 +75,13 @@ func (s *PlatformSelectionScreen) Draw(input PlatformSelectionInput) (PlatformSe
 				ButtonName: "X",
 				HelpText:   i18n.Localize(&goi18n.Message{ID: "button_settings", Other: "Settings"}, nil),
 			})
+
+			if input.ShowSaveSync {
+				footerItems = append(footerItems, gaba.FooterHelpItem{
+					ButtonName: "Y",
+					HelpText:   i18n.Localize(&goi18n.Message{ID: "button_sync", Other: "Sync"}, nil),
+				})
+			}
 		} else {
 			footerItems = append(footerItems, gaba.FooterHelpItem{
 				ButtonName: "B",
@@ -91,6 +99,9 @@ func (s *PlatformSelectionScreen) Draw(input PlatformSelectionInput) (PlatformSe
 	options := gaba.DefaultListOptions("Grout", menuItems)
 	if !internal.IsKidModeEnabled() {
 		options.ActionButton = buttons.VirtualButtonX
+		if input.ShowSaveSync {
+			options.SecondaryActionButton = buttons.VirtualButtonY
+		}
 	}
 	options.ReorderButton = buttons.VirtualButtonSelect
 	options.FooterHelpItems = footerItems
@@ -160,6 +171,12 @@ func (s *PlatformSelectionScreen) Draw(input PlatformSelectionInput) (PlatformSe
 			output.Action = PlatformSelectionActionSettings
 			return output, nil
 		}
+
+	case gaba.ListActionSecondaryTriggered:
+		output.LastSelectedIndex = sel.Selected[0]
+		output.LastSelectedPosition = sel.VisiblePosition
+		output.Action = PlatformSelectionActionSaveSync
+		return output, nil
 	}
 
 	output.Action = PlatformSelectionActionQuit
