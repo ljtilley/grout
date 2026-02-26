@@ -82,17 +82,6 @@ func actionIcon(action string) string {
 	}
 }
 
-func actionSortKey(action string) int {
-	switch action {
-	case "download":
-		return 0
-	case "upload":
-		return 1
-	default:
-		return 2
-	}
-}
-
 func (s *SyncHistoryScreen) buildSections(records []cache.SaveSyncRecord, cm *cache.Manager) []gaba.Section {
 	// Build ROM ID → platform slug lookup
 	romIDs := make([]int, 0, len(records))
@@ -157,11 +146,10 @@ func (s *SyncHistoryScreen) buildSections(records []cache.SaveSyncRecord, cm *ca
 
 	var sections []gaba.Section
 	for _, g := range groups {
-		// Sort by action group (downloads first, then uploads), then alphabetically by name
+		// Sort by time descending, then title ascending
 		sort.Slice(g.entries, func(i, j int) bool {
-			ai, aj := actionSortKey(g.entries[i].action), actionSortKey(g.entries[j].action)
-			if ai != aj {
-				return ai < aj
+			if g.entries[i].time != g.entries[j].time {
+				return g.entries[i].time > g.entries[j].time
 			}
 			return g.entries[i].romName < g.entries[j].romName
 		})
