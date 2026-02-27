@@ -66,6 +66,8 @@ type Rom struct {
 	CrcHash               string         `json:"crc_hash,omitempty"`
 	Md5Hash               string         `json:"md5_hash,omitempty"`
 	Sha1Hash              string         `json:"sha1_hash,omitempty"`
+	RetroAchievementsHash string         `json:"ra_hash,omitempty"`
+	RetroAchievementsID   int            `json:"ra_id,omitempty"`
 	HasSimpleSingleFile   bool           `json:"has_simple_single_file,omitempty"`
 	HasNestedSingleFile   bool           `json:"has_nested_single_file,omitempty"`
 	HasMultipleFiles      bool           `json:"has_multiple_files,omitempty"`
@@ -282,6 +284,7 @@ func (r Rom) MaxPlayerCount() int {
 
 func (r Rom) GetArtworkURL(kind artutil.ArtKind, host Host) string {
 	var coverURL string
+	var err error
 	logger := gaba.GetLogger()
 	logger.Debug("Getting artwork URL for ROM", "romID", r.ID, "romName", r.Name, "artKind", kind)
 
@@ -291,13 +294,13 @@ func (r Rom) GetArtworkURL(kind artutil.ArtKind, host Host) string {
 		}
 	} else if kind == artutil.ArtKindBox3D {
 		if r.ScreenScraperMetadata.Box3DPath != "" {
-			coverURL = host.URL() + r.ScreenScraperMetadata.Box3DPath
+			coverURL, err = url.JoinPath(host.URL(), r.ScreenScraperMetadata.Box3DPath)
 		} else if r.ScreenScraperMetadata.Box3DURL != "" {
 			coverURL = r.ScreenScraperMetadata.Box3DURL
 		}
 	} else if kind == artutil.ArtKindMixImage {
 		if r.ScreenScraperMetadata.MiximagePath != "" {
-			coverURL = host.URL() + r.ScreenScraperMetadata.MiximagePath
+			coverURL, err = url.JoinPath(host.URL(), r.ScreenScraperMetadata.MiximagePath)
 		} else if r.ScreenScraperMetadata.MiximageURL != "" {
 			coverURL = r.ScreenScraperMetadata.MiximageURL
 		}
@@ -305,37 +308,47 @@ func (r Rom) GetArtworkURL(kind artutil.ArtKind, host Host) string {
 
 	if kind == artutil.ArtKindDefault || coverURL == "" {
 		if r.PathCoverSmall != "" {
-			coverURL = host.URL() + r.PathCoverSmall
+			coverURL, err = url.JoinPath(host.URL(), r.PathCoverSmall)
 		} else if r.PathCoverLarge != "" {
-			coverURL = host.URL() + r.PathCoverLarge
+			coverURL, err = url.JoinPath(host.URL(), r.PathCoverLarge)
 		} else if r.URLCover != "" {
 			coverURL = r.URLCover
 		}
 	}
 
 	logger.Debug("Using cover URL", "url", coverURL)
+	if coverURL == "" && err != nil {
+		logger.Error("Error joining host URL with Box3D path", "error", err, "hostURL", host.ToLoggable(), "box3DPath", r.ScreenScraperMetadata.Box3DPath)
+	}
 
 	return strings.ReplaceAll(coverURL, " ", "%20")
 }
 
 func (r Rom) GetScreenshotURL(host Host) string {
-	screenshotURL := ""
+	var screenshotURL string
+	var err error
+	logger := gaba.GetLogger()
 	if len(r.UserScreenshots) > 0 {
-		screenshotURL = host.URL() + r.UserScreenshots[0].URLPath
+		screenshotURL, err = url.JoinPath(host.URL(), r.UserScreenshots[0].URLPath)
 	} else if len(r.MergedScreenshots) > 0 {
-		screenshotURL = host.URL() + r.MergedScreenshots[0]
+		screenshotURL, err = url.JoinPath(host.URL(), r.MergedScreenshots[0])
 	} else if r.ScreenScraperMetadata.ScreenshotURL != "" {
 		screenshotURL = r.ScreenScraperMetadata.ScreenshotURL
+	}
+
+	if screenshotURL == "" && err != nil {
+		logger.Error("Error joining host URL with screenshot path", "error", err, "hostURL", host.ToLoggable(), "screenshotPath", r.UserScreenshots[0].URLPath)
 	}
 
 	return strings.ReplaceAll(screenshotURL, " ", "%20")
 }
 
 func (r Rom) GetSplashArtURL(kind artutil.ArtKind, host Host) string {
+	var err error
 	splashArtURL := ""
 	if kind == artutil.ArtKindMarquee {
 		if r.ScreenScraperMetadata.MarqueePath != "" {
-			splashArtURL = host.URL() + r.ScreenScraperMetadata.MarqueePath
+			splashArtURL, err = url.JoinPath(host.URL(), r.ScreenScraperMetadata.MarqueePath)
 		} else if r.ScreenScraperMetadata.MarqueeURL != "" {
 			splashArtURL = r.ScreenScraperMetadata.MarqueeURL
 		}
@@ -343,5 +356,72 @@ func (r Rom) GetSplashArtURL(kind artutil.ArtKind, host Host) string {
 		splashArtURL = r.ScreenScraperMetadata.TitleScreenURL
 	}
 
+	if splashArtURL == "" && err != nil {
+		logger := gaba.GetLogger()
+		logger.Error("Error joining host URL with marquee path", "error", err, "hostURL", host.ToLoggable(), "marqueePath", r.ScreenScraperMetadata.MarqueePath)
+	}
+
 	return strings.ReplaceAll(splashArtURL, " ", "%20")
+}
+
+func (r Rom) GetMarqueeURL(host Host) string {
+	if r.ScreenScraperMetadata.MarqueePath != "" {
+		marqueeURL, err := url.JoinPath(host.URL(), r.ScreenScraperMetadata.MarqueePath)
+		if err != nil {
+			gaba.GetLogger().Error("Error joining host URL with marquee path", "error", err, "hostURL", host.ToLoggable(), "marqueePath", r.ScreenScraperMetadata.MarqueePath)
+			return ""
+		}
+		return marqueeURL
+	} else if r.ScreenScraperMetadata.MarqueeURL != "" {
+		return r.ScreenScraperMetadata.MarqueeURL
+	}
+	return ""
+}
+
+func (r Rom) GetVideoURL(host Host) string {
+	if r.ScreenScraperMetadata.VideoPath != "" {
+		videoURL, err := url.JoinPath(host.URL(), r.ScreenScraperMetadata.VideoPath)
+		if err != nil {
+			gaba.GetLogger().Error("Error joining host URL with video path", "error", err, "hostURL", host.ToLoggable(), "videoPath", r.ScreenScraperMetadata.VideoPath)
+			return ""
+		}
+		return videoURL
+	} else if r.ScreenScraperMetadata.VideoURL != "" {
+		return r.ScreenScraperMetadata.VideoURL
+	}
+	return ""
+}
+
+func (r Rom) GetBezelURL(host Host) string {
+	if r.ScreenScraperMetadata.BezelPath != "" {
+		bezelURL, err := url.JoinPath(host.URL(), r.ScreenScraperMetadata.BezelPath)
+		if err != nil {
+			gaba.GetLogger().Error("Error joining host URL with bezel path", "error", err, "hostURL", host.ToLoggable(), "bezelPath", r.ScreenScraperMetadata.BezelPath)
+			return ""
+		}
+		return bezelURL
+	} else if r.ScreenScraperMetadata.BezelURL != "" {
+		return r.ScreenScraperMetadata.BezelURL
+	}
+	return ""
+}
+
+func (r Rom) GetManualURL(host Host) string {
+	if r.PathManual != "" {
+		//return host.URL() + r.PathManual
+		manualURL, err := url.JoinPath(host.URL(), r.PathManual)
+		if err != nil {
+			gaba.GetLogger().Error("Error joining host URL with manual path", "error", err, "hostURL", host.ToLoggable(), "manualPath", r.PathManual)
+			return ""
+		}
+		return manualURL
+	} else if r.URLManual != "" {
+		return r.URLManual
+	}
+
+	if r.ScreenScraperMetadata.ManualURL != "" {
+		return r.ScreenScraperMetadata.ManualURL
+	}
+
+	return ""
 }

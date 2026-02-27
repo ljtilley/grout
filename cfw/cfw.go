@@ -31,3 +31,12 @@ func GetCFW() CFW {
 		return ""
 	}
 }
+
+func (c CFW) IsBasedOnEmulationStation() bool {
+	switch c {
+	case Knulli, ROCKNIX:
+		return true
+	default:
+		return false
+	}
+}

@@ -345,11 +345,8 @@ func (s *DownloadScreen) buildDownloads(config internal.Config, host romm.Host, 
 
 	for _, g := range games {
 		gamelistRomEntry := gamelist.RomGameEntry{
-			Game:         &g,
-			ArtLocation:  "",
-			GamePath:     "",
-			RomDirectory: "",
-			Platform:     &platform,
+			Game:     &g,
+			Platform: &platform,
 		}
 		gamePlatform := platform
 		if platform.ID == 0 && g.PlatformID != 0 {
@@ -402,7 +399,7 @@ func (s *DownloadScreen) buildDownloads(config internal.Config, host romm.Host, 
 			artLocation := filepath.Join(artDir, artFileName)
 
 			coverURL := g.GetArtworkURL(config.ArtKind, host)
-			gamelistRomEntry.ArtLocation = artLocation
+			gamelistRomEntry.ArtLocation.ImagePath = artLocation
 
 			artDownloads = append(artDownloads, artDownload{
 				URL:      coverURL,
@@ -437,6 +434,70 @@ func (s *DownloadScreen) buildDownloads(config internal.Config, host romm.Host, 
 					})
 				}
 			}
+
+			artMarqueeDir := config.GetArtMarqueeDirectory(gamePlatform)
+			if config.AdditionalDownloads.Marquee && artMarqueeDir != "" {
+				marqueeArtFileName := g.FsNameNoExt
+				// is cfw is ES based, use _marquee suffix to avoid conflicts with cover art
+				if cfw.GetCFW().IsBasedOnEmulationStation() {
+					marqueeArtFileName += "_marquee.png"
+				} else {
+					marqueeArtFileName += ".png"
+				}
+				marqueeArtLocation := filepath.Join(artMarqueeDir, marqueeArtFileName)
+				if marqueeURL := g.GetMarqueeURL(host); marqueeURL != "" {
+					gamelistRomEntry.ArtLocation.MarqueePath = marqueeArtLocation
+					artDownloads = append(artDownloads, artDownload{
+						URL:      marqueeURL,
+						Location: marqueeArtLocation,
+						GameName: g.Name,
+						IsImage:  true,
+					})
+				}
+			}
+
+			artVideoDir := config.GetArtVideoDirectory(gamePlatform)
+			if config.AdditionalDownloads.Video && artVideoDir != "" {
+				videoLocation := filepath.Join(artVideoDir, g.FsNameNoExt+".mp4")
+				if videoURL := g.GetVideoURL(host); videoURL != "" {
+					gamelistRomEntry.ArtLocation.VideoPath = videoLocation
+					artDownloads = append(artDownloads, artDownload{
+						URL:      videoURL,
+						Location: videoLocation,
+						GameName: g.Name,
+						IsImage:  false,
+					})
+				}
+			}
+
+			artBezelDir := config.GetArtBezelDirectory(gamePlatform)
+			if config.AdditionalDownloads.Bezel && artBezelDir != "" {
+				bezelArtLocation := filepath.Join(artBezelDir, artFileName)
+				if bezelURL := g.GetBezelURL(host); bezelURL != "" {
+					gamelistRomEntry.ArtLocation.BezelPath = bezelArtLocation
+					artDownloads = append(artDownloads, artDownload{
+						URL:      bezelURL,
+						Location: bezelArtLocation,
+						GameName: g.Name,
+						IsImage:  true,
+					})
+				}
+			}
+
+			manualDir := config.GetManualDirectory(gamePlatform)
+			if config.AdditionalDownloads.Manual && manualDir != "" {
+				manualLocation := filepath.Join(manualDir, g.FsNameNoExt+".pdf")
+				if manualURL := g.GetManualURL(host); manualURL != "" {
+					gamelistRomEntry.ArtLocation.ManualPath = manualLocation
+					artDownloads = append(artDownloads, artDownload{
+						URL:      manualURL,
+						Location: manualLocation,
+						GameName: g.Name,
+						IsImage:  false,
+					})
+				}
+			}
+
 		}
 		gamesSummaries = append(gamesSummaries, gamelistRomEntry)
 	}
@@ -549,15 +610,17 @@ func (s *DownloadScreen) downloadArt(artDownloads []artDownload, downloadedGames
 			continue
 		}
 
-		if err := imageutil.ProcessArtImage(art.Location); err != nil {
-			logger.Warn("Failed to process art image", "game", art.GameName, "location", art.Location, "error", err)
-			os.Remove(art.Location)
-			failCount++
-			processedCount++
-			if totalArt > 0 {
-				progress.Store(float64(processedCount) / float64(totalArt))
+		if art.IsImage {
+			if err := imageutil.ProcessArtImage(art.Location); err != nil {
+				logger.Warn("Failed to process art image", "game", art.GameName, "location", art.Location, "error", err, "url", art.URL)
+				os.Remove(art.Location)
+				failCount++
+				processedCount++
+				if totalArt > 0 {
+					progress.Store(float64(processedCount) / float64(totalArt))
+				}
+				continue
 			}
-			continue
 		}
 
 		successCount++
@@ -567,5 +630,4 @@ func (s *DownloadScreen) downloadArt(artDownloads []artDownload, downloadedGames
 			progress.Store(float64(processedCount) / float64(totalArt))
 		}
 	}
-
 }

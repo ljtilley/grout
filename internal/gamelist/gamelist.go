@@ -20,9 +20,14 @@ const (
 	MD5Element         = "md5"
 	VideoElement       = "video"
 	MarqueeElement     = "marquee"
+	BezelElement       = "bezel"
+	ManualElement      = "manual"
 	ThumbnailElement   = "thumbnail"
 	LangElement        = "lang"
 	RegionElement      = "region"
+	CheevosHashElement = "cheevosHash"
+	CheevosIDElement   = "cheevosId"
+	ScraperIDElement   = "scraperId"
 )
 
 type FileName string

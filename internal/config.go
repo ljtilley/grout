@@ -17,6 +17,14 @@ import (
 
 var kidModeEnabled atomic.Bool
 
+type AdditionalDownloads struct {
+	Marquee   bool `json:"marquee,omitempty"`
+	Video     bool `json:"video,omitempty"`
+	Thumbnail bool `json:"thumbnail,omitempty"`
+	Bezel     bool `json:"bezel,omitempty"`
+	Manual    bool `json:"manual,omitempty"`
+}
+
 type Config struct {
 	Hosts                        []romm.Host                 `json:"hosts,omitempty"`
 	DirectoryMappings            map[string]DirectoryMapping `json:"directory_mappings,omitempty"`
@@ -40,6 +48,7 @@ type Config struct {
 	ArtKind                      artutil.ArtKind             `json:"art_kind,omitempty"`
 	DownloadArtScreenshotPreview bool                        `json:"download_art_screenshot_preview,omitempty"`
 	DownloadSplashArt            artutil.ArtKind             `json:"download_splash_art,omitempty"`
+	AdditionalDownloads          AdditionalDownloads         `json:"additional_downloads,omitempty"`
 
 	PlatformOrder []string `json:"platform_order,omitempty"`
 
@@ -257,6 +266,31 @@ func (c Config) GetArtPreviewDirectory(platform romm.Platform) string {
 func (c Config) GetArtSplashDirectory(platform romm.Platform) string {
 	romDir := c.GetPlatformRomDirectory(platform)
 	return cfw.GetArtSplashDirectory(romDir, platform.FSSlug, platform.Name)
+}
+
+func (c Config) GetArtMarqueeDirectory(platform romm.Platform) string {
+	romDir := c.GetPlatformRomDirectory(platform)
+	return cfw.GetArtMarqueeDirectory(romDir, platform.FSSlug, platform.Name)
+}
+
+func (c Config) GetArtVideoDirectory(platform romm.Platform) string {
+	romDir := c.GetPlatformRomDirectory(platform)
+	return cfw.GetArtVideoDirectory(romDir, platform.FSSlug, platform.Name)
+}
+
+func (c Config) GetArtThumbnailDirectory(platform romm.Platform) string {
+	romDir := c.GetPlatformRomDirectory(platform)
+	return cfw.GetArtThumbnailDirectory(romDir, platform.FSSlug, platform.Name)
+}
+
+func (c Config) GetArtBezelDirectory(platform romm.Platform) string {
+	romDir := c.GetPlatformRomDirectory(platform)
+	return cfw.GetArtBezelDirectory(romDir, platform.FSSlug, platform.Name)
+}
+
+func (c Config) GetManualDirectory(platform romm.Platform) string {
+	romDir := c.GetPlatformRomDirectory(platform)
+	return cfw.GetManualDirectory(romDir, platform.FSSlug, platform.Name)
 }
 
 func (c Config) ShowCollections(host romm.Host) bool {
