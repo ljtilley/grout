@@ -31,15 +31,26 @@ func (s *SaveSyncScreen) Execute(config *internal.Config, host romm.Host) SaveSy
 
 	// Phase 1: Resolve — scan local saves, fetch summaries, determine actions
 	var items []sync.SyncItem
+	var resolveErr error
 	gaba.ProcessMessage(
 		i18n.Localize(&goi18n.Message{ID: "save_sync_scanning", Other: "Scanning saves..."}, nil),
 		gaba.ProcessMessageOptions{ShowThemeBackground: true},
 		func() (any, error) {
 			var err error
 			items, err = sync.ResolveSaveSync(client, config, host.DeviceID)
-			return nil, err
+			resolveErr = err
+			return nil, nil
 		},
 	)
+
+	if resolveErr != nil {
+		gaba.ConfirmationMessage(
+			i18n.Localize(&goi18n.Message{ID: "save_sync_resolve_error", Other: "Failed to connect to server.\nPlease check your connection and try again."}, nil),
+			ContinueFooter(),
+			gaba.MessageOptions{},
+		)
+		return SaveSyncOutput{}
+	}
 
 	// Check for conflicts and show resolution screen
 	var conflicts []sync.SyncItem

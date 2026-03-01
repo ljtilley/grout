@@ -22,7 +22,10 @@ func ResolveSaveSync(client *romm.Client, config *internal.Config, deviceID stri
 	localSaves := ScanSaves(config)
 	logger.Debug("Scanned local saves", "count", len(localSaves))
 
-	remoteSaves := FetchRemoteSaves(client, localSaves, deviceID)
+	remoteSaves, err := FetchRemoteSaves(client, localSaves, deviceID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch remote saves: %w", err)
+	}
 	logger.Debug("Fetched remote saves", "count", len(remoteSaves))
 
 	newSaves := LocalSavesWithoutRemote(localSaves, remoteSaves)
@@ -32,7 +35,10 @@ func ResolveSaveSync(client *romm.Client, config *internal.Config, deviceID stri
 	allItems = append(allItems, NewSaveUploadActions(newSaves)...)
 	allItems = append(allItems, DetermineActions(localSaves, remoteSaves, deviceID, config)...)
 
-	remoteOnly := DiscoverRemoteSaves(client, config, localSaves, deviceID)
+	remoteOnly, err := DiscoverRemoteSaves(client, config, localSaves, deviceID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to discover remote saves: %w", err)
+	}
 	allItems = append(allItems, remoteOnly...)
 
 	logger.Debug("Total sync items resolved", "count", len(allItems))
@@ -167,7 +173,7 @@ func ScanSaves(config *internal.Config) []LocalSave {
 
 // FetchRemoteSaves fetches saves with device_id for each ROM that has a local save.
 // This returns full save data including device_syncs for conflict detection.
-func FetchRemoteSaves(client *romm.Client, localSaves []LocalSave, deviceID string) map[int][]romm.Save {
+func FetchRemoteSaves(client *romm.Client, localSaves []LocalSave, deviceID string) (map[int][]romm.Save, error) {
 	logger := gaba.GetLogger()
 	result := make(map[int][]romm.Save)
 
@@ -181,8 +187,7 @@ func FetchRemoteSaves(client *romm.Client, localSaves []LocalSave, deviceID stri
 	for romID := range seen {
 		saves, err := client.GetSaves(romm.SaveQuery{RomID: romID, DeviceID: deviceID})
 		if err != nil {
-			logger.Error("Failed to get saves", "romID", romID, "error", err)
-			continue
+			return nil, fmt.Errorf("rom %d: %w", romID, err)
 		}
 		if len(saves) > 0 {
 			result[romID] = saves
@@ -190,7 +195,7 @@ func FetchRemoteSaves(client *romm.Client, localSaves []LocalSave, deviceID stri
 		}
 	}
 
-	return result
+	return result, nil
 }
 
 func LocalSavesWithoutRemote(localSaves []LocalSave, remoteSaves map[int][]romm.Save) []LocalSave {
@@ -502,13 +507,13 @@ func download(client *romm.Client, config *internal.Config, deviceID string, ite
 	return true
 }
 
-func DiscoverRemoteSaves(client *romm.Client, config *internal.Config, localSaves []LocalSave, deviceID string) []SyncItem {
+func DiscoverRemoteSaves(client *romm.Client, config *internal.Config, localSaves []LocalSave, deviceID string) ([]SyncItem, error) {
 	logger := gaba.GetLogger()
 
 	scan := cfw.ScanRoms(config)
 	resolved := ResolveLocalRoms(scan)
 	if len(resolved) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	coveredRomIDs := make(map[int]bool)
@@ -525,7 +530,7 @@ func DiscoverRemoteSaves(client *romm.Client, config *internal.Config, localSave
 
 	if len(uncoveredRomIDs) == 0 {
 		logger.Debug("All local ROMs already have local saves")
-		return nil
+		return nil, nil
 	}
 
 	logger.Debug("Checking remote saves for ROMs without local saves", "count", len(uncoveredRomIDs))
@@ -534,8 +539,7 @@ func DiscoverRemoteSaves(client *romm.Client, config *internal.Config, localSave
 	for _, romID := range uncoveredRomIDs {
 		saves, err := client.GetSaves(romm.SaveQuery{RomID: romID, DeviceID: deviceID})
 		if err != nil {
-			logger.Debug("Failed to get saves", "romID", romID, "error", err)
-			continue
+			return nil, fmt.Errorf("rom %d: %w", romID, err)
 		}
 
 		preferredSlot := "default"
@@ -564,7 +568,7 @@ func DiscoverRemoteSaves(client *romm.Client, config *internal.Config, localSave
 	}
 
 	logger.Debug("Remote-only saves to download", "count", len(items))
-	return items
+	return items, nil
 }
 
 func ResolveSaveDirectory(fsSlug string, config *internal.Config) string {

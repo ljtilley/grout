@@ -51,7 +51,11 @@ func main() {
 	localSaves := sync.ScanSaves(config)
 	fmt.Printf("Local saves found: %d\n", len(localSaves))
 
-	remoteSaves := sync.FetchRemoteSaves(client, localSaves, host.DeviceID)
+	remoteSaves, err := sync.FetchRemoteSaves(client, localSaves, host.DeviceID)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to fetch remote saves: %v\n", err)
+		os.Exit(1)
+	}
 	fmt.Printf("ROMs with remote saves: %d\n", len(remoteSaves))
 
 	if debug {
@@ -69,7 +73,11 @@ func main() {
 	items = append(items, sync.DetermineActions(localSaves, remoteSaves, host.DeviceID, config)...)
 
 	fmt.Println("Scanning for remote-only saves...")
-	remoteOnly := sync.DiscoverRemoteSaves(client, config, localSaves, host.DeviceID)
+	remoteOnly, err := sync.DiscoverRemoteSaves(client, config, localSaves, host.DeviceID)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Failed to discover remote saves: %v\n", err)
+		os.Exit(1)
+	}
 	items = append(items, remoteOnly...)
 
 	fmt.Printf("Total sync items: %d\n\n", len(items))
