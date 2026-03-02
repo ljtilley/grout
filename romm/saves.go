@@ -102,14 +102,6 @@ func (scq SaveContentQuery) Valid() bool {
 	return scq.DeviceID != ""
 }
 
-type SaveDeviceQuery struct {
-	DeviceID string `qs:"device_id,omitempty"`
-}
-
-func (sdq SaveDeviceQuery) Valid() bool {
-	return sdq.DeviceID != ""
-}
-
 type SaveDeviceBody struct {
 	DeviceID string `json:"device_id"`
 }
@@ -120,12 +112,6 @@ type SaveSummaryQuery struct {
 
 func (ssq SaveSummaryQuery) Valid() bool {
 	return ssq.RomID != 0
-}
-
-func (c *Client) GetSaveIdentifiers() ([]int, error) {
-	var ids []int
-	err := c.doRequest("GET", endpointSaveIdentifiers, nil, nil, &ids)
-	return ids, err
 }
 
 func (c *Client) GetSaves(query SaveQuery) ([]Save, error) {
@@ -149,18 +135,6 @@ func (c *Client) DownloadSaveByID(saveID int, deviceID string, optimistic bool) 
 
 func (c *Client) ConfirmSaveDownloaded(saveID int, deviceID string) error {
 	path := fmt.Sprintf(endpointSaveDownloaded, saveID)
-	body := SaveDeviceBody{DeviceID: deviceID}
-	return c.doRequest("POST", path, nil, body, nil)
-}
-
-func (c *Client) TrackSave(saveID int, deviceID string) error {
-	path := fmt.Sprintf(endpointSaveTrack, saveID)
-	body := SaveDeviceBody{DeviceID: deviceID}
-	return c.doRequest("POST", path, nil, body, nil)
-}
-
-func (c *Client) UntrackSave(saveID int, deviceID string) error {
-	path := fmt.Sprintf(endpointSaveUntrack, saveID)
 	body := SaveDeviceBody{DeviceID: deviceID}
 	return c.doRequest("POST", path, nil, body, nil)
 }

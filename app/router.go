@@ -203,12 +203,6 @@ func registerScreens(r *router.Router, state *AppState) {
 		return screen.Draw(in)
 	})
 
-	r.Register(ScreenSaveConflict, func(input any) (any, error) {
-		in := input.(ui.SaveConflictInput)
-		screen := ui.NewSaveConflictScreen()
-		return screen.Draw(in)
-	})
-
 	r.Register(ScreenSyncMenu, func(input any) (any, error) {
 		screen := ui.NewSyncMenuScreen()
 		return screen.Draw(input.(ui.SyncMenuInput))

@@ -589,6 +589,12 @@ other = "Оставить удалённое"
 [save_conflict_title]
 other = "Разрешение конфликтов"
 
+[save_sync_backup_limit]
+other = "Save Backups"
+
+[save_sync_backup_no_limit]
+other = "No Limit"
+
 [save_sync_conflicts]
 other = "Конфликты"
 
@@ -624,6 +630,9 @@ other = "{{.Name}} (Не найдено в RomM)"
 
 [save_sync_no_changes]
 other = "Всё актуально!\nИдите играть!"
+
+[save_sync_resolve_error]
+other = "Failed to connect to server.\nPlease check your connection and try again."
 
 [save_sync_results_title]
 other = "Синхронизация завершена"

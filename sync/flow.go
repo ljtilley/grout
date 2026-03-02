@@ -10,10 +10,14 @@ import (
 	"grout/version"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
+	gosync "sync"
 
 	gaba "github.com/BrandonKowalski/gabagool/v2/pkg/gabagool"
 )
+
+const maxConcurrentRequests = 8
 
 func ResolveSaveSync(client *romm.Client, config *internal.Config, deviceID string) ([]SyncItem, error) {
 	logger := gaba.GetLogger()
@@ -175,23 +179,54 @@ func ScanSaves(config *internal.Config) []LocalSave {
 // This returns full save data including device_syncs for conflict detection.
 func FetchRemoteSaves(client *romm.Client, localSaves []LocalSave, deviceID string) (map[int][]romm.Save, error) {
 	logger := gaba.GetLogger()
-	result := make(map[int][]romm.Save)
 
 	seen := make(map[int]bool)
 	for _, ls := range localSaves {
 		seen[ls.RomID] = true
 	}
 
-	logger.Debug("Fetching remote saves", "romCount", len(seen))
+	romIDs := make([]int, 0, len(seen))
+	for id := range seen {
+		romIDs = append(romIDs, id)
+	}
 
-	for romID := range seen {
-		saves, err := client.GetSaves(romm.SaveQuery{RomID: romID, DeviceID: deviceID})
-		if err != nil {
-			return nil, fmt.Errorf("rom %d: %w", romID, err)
+	logger.Debug("Fetching remote saves", "romCount", len(romIDs))
+
+	type fetchResult struct {
+		romID int
+		saves []romm.Save
+		err   error
+	}
+
+	results := make(chan fetchResult, len(romIDs))
+	sem := make(chan struct{}, maxConcurrentRequests)
+	var wg gosync.WaitGroup
+
+	for _, romID := range romIDs {
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			saves, err := client.GetSaves(romm.SaveQuery{RomID: id, DeviceID: deviceID})
+			results <- fetchResult{romID: id, saves: saves, err: err}
+		}(romID)
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	result := make(map[int][]romm.Save)
+	for r := range results {
+		if r.err != nil {
+			return nil, fmt.Errorf("rom %d: %w", r.romID, r.err)
 		}
-		if len(saves) > 0 {
-			result[romID] = saves
-			logger.Debug("Fetched remote saves", "romID", romID, "count", len(saves))
+		if len(r.saves) > 0 {
+			result[r.romID] = r.saves
+			logger.Debug("Fetched remote saves", "romID", r.romID, "count", len(r.saves))
 		}
 	}
 
@@ -411,6 +446,9 @@ func upload(client *romm.Client, deviceID string, item *SyncItem) bool {
 	}
 
 	emulator := filepath.Base(item.LocalSave.EmulatorDir)
+	if emulator == "." || emulator == "" {
+		emulator = "unknown"
+	}
 
 	query := romm.UploadSaveQuery{
 		RomID:     item.LocalSave.RomID,
@@ -458,6 +496,9 @@ func download(client *romm.Client, config *internal.Config, deviceID string, ite
 				logger.Warn("Failed to backup save before download", "path", item.LocalSave.FilePath, "error", err)
 			} else {
 				logger.Debug("Backed up save before download", "backup", backupPath)
+				if config != nil && config.SaveBackupLimit > 0 {
+					cleanupBackups(backupDir, base, config.SaveBackupLimit)
+				}
 			}
 		}
 	}
@@ -535,29 +576,55 @@ func DiscoverRemoteSaves(client *romm.Client, config *internal.Config, localSave
 
 	logger.Debug("Checking remote saves for ROMs without local saves", "count", len(uncoveredRomIDs))
 
-	var items []SyncItem
+	type discoverResult struct {
+		romID int
+		saves []romm.Save
+		err   error
+	}
+
+	results := make(chan discoverResult, len(uncoveredRomIDs))
+	sem := make(chan struct{}, maxConcurrentRequests)
+	var wg gosync.WaitGroup
+
 	for _, romID := range uncoveredRomIDs {
-		saves, err := client.GetSaves(romm.SaveQuery{RomID: romID, DeviceID: deviceID})
-		if err != nil {
-			return nil, fmt.Errorf("rom %d: %w", romID, err)
+		wg.Add(1)
+		go func(id int) {
+			defer wg.Done()
+			sem <- struct{}{}
+			defer func() { <-sem }()
+
+			saves, err := client.GetSaves(romm.SaveQuery{RomID: id, DeviceID: deviceID})
+			results <- discoverResult{romID: id, saves: saves, err: err}
+		}(romID)
+	}
+
+	go func() {
+		wg.Wait()
+		close(results)
+	}()
+
+	var items []SyncItem
+	for r := range results {
+		if r.err != nil {
+			return nil, fmt.Errorf("rom %d: %w", r.romID, r.err)
 		}
 
 		preferredSlot := "default"
 		if config != nil {
-			preferredSlot = config.GetSlotPreference(romID)
+			preferredSlot = config.GetSlotPreference(r.romID)
 		}
-		remoteSave := selectSaveForSync(saves, preferredSlot)
+		remoteSave := selectSaveForSync(r.saves, preferredSlot)
 		if remoteSave == nil {
 			continue
 		}
 
-		rom := resolved[romID]
+		rom := resolved[r.romID]
 		logger.Debug("Found remote save for ROM without local save",
-			"romID", romID, "romName", rom.RomName, "saveFile", remoteSave.FileName)
+			"romID", r.romID, "romName", rom.RomName, "saveFile", remoteSave.FileName)
 
 		items = append(items, SyncItem{
 			LocalSave: LocalSave{
-				RomID:       romID,
+				RomID:       r.romID,
 				RomName:     rom.RomName,
 				FSSlug:      rom.FSSlug,
 				RomFileName: rom.FileName,
@@ -569,6 +636,54 @@ func DiscoverRemoteSaves(client *romm.Client, config *internal.Config, localSave
 
 	logger.Debug("Remote-only saves to download", "count", len(items))
 	return items, nil
+}
+
+func cleanupBackups(backupDir string, baseName string, limit int) {
+	if limit <= 0 {
+		return
+	}
+
+	logger := gaba.GetLogger()
+	entries, err := os.ReadDir(backupDir)
+	if err != nil {
+		return
+	}
+
+	// Collect backup files for this game (matching base name prefix)
+	type backupFile struct {
+		name    string
+		modTime int64
+	}
+	var backups []backupFile
+	for _, e := range entries {
+		if e.IsDir() || !strings.HasPrefix(e.Name(), baseName+" [") {
+			continue
+		}
+		info, err := e.Info()
+		if err != nil {
+			continue
+		}
+		backups = append(backups, backupFile{name: e.Name(), modTime: info.ModTime().UnixNano()})
+	}
+
+	if len(backups) <= limit {
+		return
+	}
+
+	// Sort oldest first
+	sort.Slice(backups, func(i, j int) bool {
+		return backups[i].modTime < backups[j].modTime
+	})
+
+	// Remove oldest until we're at the limit
+	for i := 0; i < len(backups)-limit; i++ {
+		path := filepath.Join(backupDir, backups[i].name)
+		if err := os.Remove(path); err != nil {
+			logger.Warn("Failed to remove old backup", "path", path, "error", err)
+		} else {
+			logger.Debug("Removed old backup", "path", path)
+		}
+	}
 }
 
 func ResolveSaveDirectory(fsSlug string, config *internal.Config) string {

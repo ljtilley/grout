@@ -589,6 +589,12 @@ other = "Manter remoto"
 [save_conflict_title]
 other = "Resolver conflitos"
 
+[save_sync_backup_limit]
+other = "Save Backups"
+
+[save_sync_backup_no_limit]
+other = "No Limit"
+
 [save_sync_conflicts]
 other = "Conflitos"
 
@@ -624,6 +630,9 @@ other = "{{.Name}} (Não encontrado no RomM)"
 
 [save_sync_no_changes]
 other = "Tudo atualizado!\nVá jogar!"
+
+[save_sync_resolve_error]
+other = "Failed to connect to server.\nPlease check your connection and try again."
 
 [save_sync_results_title]
 other = "Sincronização concluída"

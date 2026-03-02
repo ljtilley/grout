@@ -288,3 +288,16 @@ func collectionViewToIndex(view internal.CollectionView) int {
 		return 0
 	}
 }
+
+func backupLimitToIndex(limit int) int {
+	switch limit {
+	case 5:
+		return 0
+	case 10:
+		return 1
+	case 15:
+		return 2
+	default:
+		return 3 // No Limit (0)
+	}
+}

@@ -51,6 +51,18 @@ func (s *SaveSyncSettingsScreen) Draw(input SaveSyncSettingsInput) (SaveSyncSett
 			},
 			Options: []gaba.Option{{Type: gaba.OptionTypeClickable}},
 		},
+		{
+			Item: gaba.MenuItem{
+				Text: i18n.Localize(&goi18n.Message{ID: "save_sync_backup_limit", Other: "Save Backups"}, nil),
+			},
+			Options: []gaba.Option{
+				{DisplayName: "5", Value: 5},
+				{DisplayName: "10", Value: 10},
+				{DisplayName: "15", Value: 15},
+				{DisplayName: i18n.Localize(&goi18n.Message{ID: "save_sync_backup_no_limit", Other: "No Limit"}, nil), Value: 0},
+			},
+			SelectedOption: backupLimitToIndex(input.Config.SaveBackupLimit),
+		},
 	}
 
 	result, err := gaba.OptionsList(
@@ -70,7 +82,17 @@ func (s *SaveSyncSettingsScreen) Draw(input SaveSyncSettingsInput) (SaveSyncSett
 		return output, err
 	}
 
+	// Apply backup limit setting
+	if val, ok := result.Items[1].Options[result.Items[1].SelectedOption].Value.(int); ok {
+		output.Config.SaveBackupLimit = val
+	}
+
 	if result.Action != gaba.ListActionSelected {
+		return output, nil
+	}
+
+	// Only the device name row is clickable
+	if result.Selected != 0 {
 		return output, nil
 	}
 

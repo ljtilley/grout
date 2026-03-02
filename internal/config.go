@@ -41,6 +41,7 @@ type Config struct {
 	PlatformOrder         []string          `json:"platform_order,omitempty"`
 	SaveDirectoryMappings map[string]string `json:"save_directory_mappings,omitempty"`
 	SlotPreferences       map[string]string `json:"slot_preferences,omitempty"`
+	SaveBackupLimit       int               `json:"save_backup_limit,omitempty"` // 0 = no limit, 5/10/15 = keep N most recent per game
 
 	PlatformsBinding map[string]string `json:"-"`
 }

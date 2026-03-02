@@ -592,6 +592,12 @@ other = "リモートを保持"
 [save_conflict_title]
 other = "競合の解決"
 
+[save_sync_backup_limit]
+other = "Save Backups"
+
+[save_sync_backup_no_limit]
+other = "No Limit"
+
 [save_sync_conflicts]
 other = "競合"
 
@@ -627,6 +633,9 @@ other = "{{.Name}} (RomMに見つかりません)"
 
 [save_sync_no_changes]
 other = "すべて最新です！\nゲームをプレイしましょう！"
+
+[save_sync_resolve_error]
+other = "Failed to connect to server.\nPlease check your connection and try again."
 
 [save_sync_results_title]
 other = "同期完了"

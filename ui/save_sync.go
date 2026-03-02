@@ -29,6 +29,16 @@ func NewSaveSyncScreen() *SaveSyncScreen {
 func (s *SaveSyncScreen) Execute(config *internal.Config, host romm.Host) SaveSyncOutput {
 	client := romm.NewClientFromHost(host, config.ApiTimeout)
 
+	// Health check — verify server is reachable before starting sync
+	if _, err := client.GetHeartbeat(); err != nil {
+		gaba.ConfirmationMessage(
+			i18n.Localize(&goi18n.Message{ID: "save_sync_resolve_error", Other: "Failed to connect to server.\nPlease check your connection and try again."}, nil),
+			ContinueFooter(),
+			gaba.MessageOptions{},
+		)
+		return SaveSyncOutput{}
+	}
+
 	// Phase 1: Resolve — scan local saves, fetch summaries, determine actions
 	var items []sync.SyncItem
 	var resolveErr error

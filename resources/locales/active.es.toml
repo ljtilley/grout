@@ -589,6 +589,12 @@ other = "Mantener remoto"
 [save_conflict_title]
 other = "Resolver conflictos"
 
+[save_sync_backup_limit]
+other = "Save Backups"
+
+[save_sync_backup_no_limit]
+other = "No Limit"
+
 [save_sync_conflicts]
 other = "Conflictos"
 
@@ -624,6 +630,9 @@ other = "{{.Name}} (No encontrado en RomM)"
 
 [save_sync_no_changes]
 other = "¡Todo está actualizado!\n¡Ve a jugar!"
+
+[save_sync_resolve_error]
+other = "Failed to connect to server.\nPlease check your connection and try again."
 
 [save_sync_results_title]
 other = "Sincronización completada"
