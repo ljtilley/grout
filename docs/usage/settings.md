@@ -131,7 +131,7 @@ This sub-menu contains advanced configuration and system settings.
 Pre-cache artwork for all games across all mapped platforms. Grout scans your platforms, identifies
 games without cached artwork, and downloads cover art from RomM. Useful for pre-caching after adding new games.
 
-Note that this artwork is only displayed within Grout's interface — it does not affect the artwork shown in your CFW's game list.
+Note that this artwork is only displayed within Grout's interface - it does not affect the artwork shown in your CFW's game list.
 
 ### Rebuild Cache
 

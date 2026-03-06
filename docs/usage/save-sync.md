@@ -18,7 +18,7 @@ Once registered, the **Sync** button (`Y`) appears on the main menu, giving you 
 
 Press `Y` from the main menu to open the Sync Menu. It contains:
 
-- **Sync Now** - Run a manual save sync. If you've synced before, the last sync time is shown (e.g., "Sync Now · 2h ago")
+- **Sync Now** - Run a manual save sync
 - **Synced Games** - Browse games that have been synced on this device, grouped by platform. From here you can view save details and manage save slots for individual games.
 - **View History** - See a chronological log of all sync actions (uploads, downloads) for this device
 
@@ -212,6 +212,10 @@ sides to use the same emulator and sometimes even the same version.
 
 Grout supports a wide range of save file extensions: `.srm`, `.sav`, `.dsv`, `.mcr`, `.mcd`, `.brm`, `.eep`, `.sra`,
 `.fla`, `.mpk`, and `.nv`.
+
+We have this filter in place as some CFWs place the save files alongside the ROM files.
+
+If you notice that a save that is not being synced has an extension not in this list, please [create an issue on GitHub](https://github.com/rommapp/grout/issues/new?template=bug-report.md).
 
 ### Syncs can be obscured by autoload { data-toc-label="Autoload Warning" }
 
