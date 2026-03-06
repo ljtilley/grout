@@ -69,16 +69,16 @@ func migrateIfNeeded(db *sql.DB) error {
 		}
 	}
 
-	// v9 removes save_mappings and filename_mappings tables (save sync ripped out)
-	if currentVersion < 9 {
+	// v10 removes save_mappings, filename_mappings, and failed_lookups tables (save sync ripped out)
+	if currentVersion < 10 {
 		if _, err := db.Exec("DROP TABLE IF EXISTS save_mappings"); err != nil {
-			return fmt.Errorf("migration to v9: drop save_mappings: %w", err)
+			return fmt.Errorf("migration to v10: drop save_mappings: %w", err)
 		}
 		if _, err := db.Exec("DROP TABLE IF EXISTS filename_mappings"); err != nil {
-			return fmt.Errorf("migration to v9: drop filename_mappings: %w", err)
+			return fmt.Errorf("migration to v10: drop filename_mappings: %w", err)
 		}
 		if _, err := db.Exec("DROP TABLE IF EXISTS failed_lookups"); err != nil {
-			return fmt.Errorf("migration to v9: drop failed_lookups: %w", err)
+			return fmt.Errorf("migration to v10: drop failed_lookups: %w", err)
 		}
 	}
 

@@ -263,11 +263,13 @@ func transitionSaveSync(ctx *transitionContext, result any) (router.Screen, any)
 func transitionSaveConflict(ctx *transitionContext, result any) (router.Screen, any) {
 	r := result.(ui.SaveConflictOutput)
 
-	if r.Action == ui.SaveConflictActionResolved {
-		for ci, resolved := range r.Items {
-			if idx, ok := r.ConflictIndices[ci]; ok && idx < len(r.AllItems) {
-				r.AllItems[idx] = resolved
-			}
+	if r.Action != ui.SaveConflictActionResolved {
+		return popOrExit(ctx.stack)
+	}
+
+	for ci, resolved := range r.Items {
+		if idx, ok := r.ConflictIndices[ci]; ok && idx < len(r.AllItems) {
+			r.AllItems[idx] = resolved
 		}
 	}
 

@@ -63,7 +63,12 @@ func (cm *Manager) GetSaveSyncHistory(deviceID string) []SaveSyncRecord {
 		if err := rows.Scan(&r.ID, &r.RomID, &r.RomName, &r.Action, &r.DeviceID, &r.SaveID, &r.FileName, &syncedAt); err != nil {
 			continue
 		}
-		r.SyncedAt, _ = time.Parse(time.RFC3339, syncedAt)
+		parsed, err := time.Parse(time.RFC3339, syncedAt)
+		if err != nil {
+			gaba.GetLogger().Warn("Failed to parse synced_at timestamp", "value", syncedAt, "error", err)
+		} else {
+			r.SyncedAt = parsed
+		}
 		records = append(records, r)
 	}
 	if err := rows.Err(); err != nil {

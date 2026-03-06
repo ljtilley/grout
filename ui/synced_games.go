@@ -326,7 +326,9 @@ func (s *SyncedGamesScreen) showSlotSelector(config *internal.Config, romID int,
 				selectedOpt := item.Options[item.SelectedOption]
 				if selectedSlot, ok := selectedOpt.Value.(string); ok && selectedSlot != "" {
 					config.SetSlotPreference(romID, selectedSlot)
-					internal.SaveSlotPreferences(config)
+					if err := internal.SaveSlotPreferences(config); err != nil {
+						gaba.GetLogger().Warn("Failed to save slot preferences", "error", err)
+					}
 					return true
 				}
 			}
