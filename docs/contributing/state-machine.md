@@ -1,3 +1,8 @@
+---
+search:
+  exclude: true
+---
+
 # State Machine Reference
 
 This document shows the navigation flow between screens in Grout.
