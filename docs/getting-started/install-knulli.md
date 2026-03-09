@@ -6,9 +6,11 @@ This guide will help you install Grout on devices running [Knulli](https://knull
 
 Grout has been tested on the following devices running Knulli Gladiator II:
 
-| Manufacturer | Device |
-|--------------|--------|
-| Anbernic     | RG34XX |
+| Manufacturer |  Device   |
+|--------------|-----------|
+| Anbernic     | RG34XX    |
+| Anbernic     | RG35XX SP |
+| Trimui       | Smart Pro |
 
 _Please help verify compatibility on other devices by reporting your results!_
 
