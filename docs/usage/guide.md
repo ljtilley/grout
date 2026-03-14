@@ -334,6 +334,9 @@ different revisions (Rev A, Rev B). When a game has multiple versions available:
 - **Save Directory** - Choose which emulator's save folder this game should use. This overrides the platform-wide
   setting configured in Save Sync Mappings. When changed, Grout automatically moves existing save files to the new
   location. This is useful when you use different emulators for specific games within the same platform.
+- **Save Slot** - Choose which save slot to sync to for this game. Appears when Save Sync is enabled (device
+  registered). You can select an existing slot or create a new one with **New Slot...**. Changing the slot triggers
+  a sync automatically. See [Save Slots](save-sync.md#save-slots) for details.
 
 !!! important
     **Kids Mode Impact:** When Kids Mode is enabled, the Game Options screen is hidden.
@@ -357,7 +360,7 @@ appropriate directory on your device. Press `Y` to cancel the download.
    file, extracts it, and creates an M3U playlist file so your emulator can handle disc switching.
 
 3. **Artwork is downloaded** - If "Download Art" is enabled in Settings, Grout downloads box art for each game to your
-   artwork directory after the ROMs finish. This artwork is only displayed within Grout — it does not affect artwork shown in your CFW's game list.
+   artwork directory after the ROMs finish. This artwork is only displayed within Grout - it does not affect artwork shown in your CFW's game list.
 
 4. **Archived files are extracted automatically** - If "Archived Downloads" is set to "Uncompress" in Settings, Grout
    will extract zip and 7z files to the configured ROM directory and then delete the archive.

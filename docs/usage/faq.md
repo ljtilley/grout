@@ -18,6 +18,10 @@ Grout
 supports [muOS](../getting-started/install-muos.md), [Knulli](../getting-started/install-knulli.md), [ROCKNIX](../getting-started/install-rocknix.md), [Spruce](../getting-started/install-spruce.md), [NextUI](../getting-started/install-nextui.md),
 and [TrimUI Stock OS](../getting-started/install-trimui.md). See each installation guide for tested devices.
 
+### Hey! What about Miyoo devices?
+
+Grout is not currently supported on Miyoo devices. We hope to change that in the future.
+
 ### Can I use Grout with OIDC / Single Sign-On?
 
 Grout requires a username and password to authenticate. If your RomM instance uses OIDC, you can still use Grout by

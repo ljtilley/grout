@@ -11,11 +11,12 @@ hide:
 
 ![Grout](resources/img/logotipo.png){ width="250" }
 
-Download and manage games from your [RomM](https://romm.app) instance directly on your retro doo-dad.
+Download and manage games from your [RomM](https://romm.app) instance directly on your Linux based retro handheld.
 
-[muOS](getting-started/install-muos.md) · [Knulli](getting-started/install-knulli.md) · [ROCKNIX](getting-started/install-rocknix.md) · [Spruce](getting-started/install-spruce.md) · [NextUI](getting-started/install-nextui.md) · [TrimUI](getting-started/install-trimui.md)
+[muOS](getting-started/install-muos.md) · [Knulli](getting-started/install-knulli.md) · [ROCKNIX](getting-started/install-rocknix.md) · [Spruce](getting-started/install-spruce.md) · [NextUI](getting-started/install-nextui.md) · [TrimUI](getting-started/install-trimui.md) · [Batocera](getting-started/install-batocera.md)
 
-[:octicons-rocket-16: Get Started](getting-started/index.md){ .md-button .md-button--primary }
+[:fontawesome-solid-gamepad: Get Started](getting-started/index.md){ .md-button .md-button--primary }
+&nbsp;&nbsp;
 [:octicons-book-16: User Guide](usage/guide.md){ .md-button }
 
 </div>
@@ -50,11 +51,11 @@ Download and manage games from your [RomM](https://romm.app) instance directly o
 
     Keep your game saves synchronized between your RomM server and your device. Play on one device, pick up on another.
 
--   **Smart Platform Mapping**
+-   **On-Device Platform Mapping**
 
     ---
 
-    Grout automatically maps RomM platforms to the correct directories for your custom firmware.
+    Map RomM platforms to the ROM directories on your device so Grout knows where to find and place your games.
 
 -   **Multilingual**
 

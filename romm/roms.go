@@ -126,6 +126,8 @@ type GetRomsQuery struct {
 	OrderBy             string `qs:"order_by,omitempty"`
 	OrderDir            string `qs:"order_dir,omitempty"`
 	UpdatedAfter        string `qs:"updated_after,omitempty"` // ISO8601 timestamp with timezone
+	WithFilterValues    bool   `qs:"with_filter_values"`
+	WithCharIndex       bool   `qs:"with_char_index"`
 }
 
 func (q GetRomsQuery) Valid() bool {
@@ -155,6 +157,12 @@ func (c *Client) GetRoms(query GetRomsQuery) (PaginatedRoms, error) {
 	err := c.doRequest("GET", endpointRoms, query, nil, &result)
 	return result, err
 }
+func (c *Client) GetRomIdentifiers() ([]int, error) {
+	var ids []int
+	err := c.doRequest("GET", endpointRomIdentifiers, nil, nil, &ids)
+	return ids, err
+}
+
 func (c *Client) GetRomByHash(query GetRomByHashQuery) (Rom, error) {
 	var rom Rom
 	err := c.doRequest("GET", endpointRomsByHash, query, nil, &rom)
@@ -310,4 +318,32 @@ func (r Rom) GetArtworkURL(kind artutil.ArtKind, host Host) string {
 	logger.Debug("Using cover URL", "url", coverURL)
 
 	return strings.ReplaceAll(coverURL, " ", "%20")
+}
+
+func (r Rom) GetScreenshotURL(host Host) string {
+	screenshotURL := ""
+	if len(r.UserScreenshots) > 0 {
+		screenshotURL = host.URL() + r.UserScreenshots[0].URLPath
+	} else if len(r.MergedScreenshots) > 0 {
+		screenshotURL = host.URL() + r.MergedScreenshots[0]
+	} else if r.ScreenScraperMetadata.ScreenshotURL != "" {
+		screenshotURL = r.ScreenScraperMetadata.ScreenshotURL
+	}
+
+	return strings.ReplaceAll(screenshotURL, " ", "%20")
+}
+
+func (r Rom) GetSplashArtURL(kind artutil.ArtKind, host Host) string {
+	splashArtURL := ""
+	if kind == artutil.ArtKindMarquee {
+		if r.ScreenScraperMetadata.MarqueePath != "" {
+			splashArtURL = host.URL() + r.ScreenScraperMetadata.MarqueePath
+		} else if r.ScreenScraperMetadata.MarqueeURL != "" {
+			splashArtURL = r.ScreenScraperMetadata.MarqueeURL
+		}
+	} else if kind == artutil.ArtKindTitle && r.ScreenScraperMetadata.TitleScreenURL != "" {
+		splashArtURL = r.ScreenScraperMetadata.TitleScreenURL
+	}
+
+	return strings.ReplaceAll(splashArtURL, " ", "%20")
 }
