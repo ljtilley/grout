@@ -228,4 +228,9 @@ func registerScreens(r *router.Router, state *AppState) {
 		return screen.Draw(input.(ui.SaveMappingInput))
 	})
 
+	r.Register(ScreenServerAddress, func(input any) (any, error) {
+		screen := ui.NewServerAddressScreen()
+		return screen.Draw(input.(ui.ServerAddressInput))
+	})
+
 }

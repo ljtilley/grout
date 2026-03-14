@@ -22,6 +22,7 @@ type AdvancedSettingsOutput struct {
 	Action                AdvancedSettingsAction
 	RebuildCacheClicked   bool
 	SyncArtworkClicked    bool
+	ServerAddressClicked  bool
 	LastSelectedIndex     int
 	LastVisibleStartIndex int
 }
@@ -79,6 +80,12 @@ func (s *AdvancedSettingsScreen) Draw(input AdvancedSettingsInput) (AdvancedSett
 		if selectedText == i18n.Localize(&goi18n.Message{ID: "settings_sync_artwork", Other: "Preload Artwork"}, nil) {
 			output.SyncArtworkClicked = true
 			output.Action = AdvancedSettingsActionSyncArtwork
+			return output, nil
+		}
+
+		if selectedText == i18n.Localize(&goi18n.Message{ID: "settings_server_address", Other: "Server Address"}, nil) {
+			output.ServerAddressClicked = true
+			output.Action = AdvancedSettingsActionServerAddress
 			return output, nil
 		}
 	}
@@ -142,6 +149,10 @@ func (s *AdvancedSettingsScreen) buildMenuItems(config *internal.Config) []gaba.
 				{DisplayName: i18n.Localize(&goi18n.Message{ID: "option_enabled", Other: "Enabled"}, nil), Value: true},
 			},
 			SelectedOption: boolToIndex(config.KidMode),
+		},
+		{
+			Item:    gaba.MenuItem{Text: i18n.Localize(&goi18n.Message{ID: "settings_server_address", Other: "Server Address"}, nil)},
+			Options: []gaba.Option{{Type: gaba.OptionTypeClickable}},
 		},
 		{
 			Item: gaba.MenuItem{Text: i18n.Localize(&goi18n.Message{ID: "settings_release_channel", Other: "Release Channel"}, nil)},

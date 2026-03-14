@@ -98,6 +98,7 @@ const (
 	AdvancedSettingsActionSaved AdvancedSettingsAction = iota
 	AdvancedSettingsActionRebuildCache
 	AdvancedSettingsActionSyncArtwork
+	AdvancedSettingsActionServerAddress
 	AdvancedSettingsActionBack
 )
 

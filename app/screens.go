@@ -35,4 +35,5 @@ const (
 	ScreenSyncedGames
 	ScreenSyncHistory
 	ScreenSaveMapping
+	ScreenServerAddress
 )

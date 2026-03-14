@@ -88,6 +88,8 @@ func buildTransitionFunc(state *AppState, quitOnBack bool, initialShowCollection
 			return transitionSaveSyncSettings(ctx, result)
 		case ScreenSaveMapping:
 			return transitionSaveMapping(ctx, result)
+		case ScreenServerAddress:
+			return transitionServerAddress(ctx, result)
 		}
 
 		return router.ScreenExit, nil
@@ -707,12 +709,33 @@ func transitionAdvancedSettings(ctx *transitionContext, result any) (router.Scre
 			Host:   ctx.state.Host,
 		}
 
+	case ui.AdvancedSettingsActionServerAddress:
+		ctx.stack.Push(ScreenAdvancedSettings, pushInput, r)
+		return ScreenServerAddress, ui.ServerAddressInput{
+			Config: ctx.state.Config,
+			Host:   ctx.state.Host,
+		}
+
 	default:
 		if ctx.state.AutoUpdate != nil {
 			ctx.state.AutoUpdate.Recheck(ctx.state.Config.ReleaseChannel)
 		}
 		return popOrExit(ctx.stack)
 	}
+}
+
+func transitionServerAddress(ctx *transitionContext, result any) (router.Screen, any) {
+	r := result.(ui.ServerAddressOutput)
+
+	if r.Action == ui.ServerAddressActionSaved {
+		ctx.state.Host = r.Host
+		ctx.state.Config.Hosts[0] = r.Host
+		if err := internal.SaveConfig(ctx.state.Config); err != nil {
+			gaba.GetLogger().Error("Failed to save config after server address change", "error", err)
+		}
+	}
+
+	return popOrExit(ctx.stack)
 }
 
 func transitionPlatformMapping(ctx *transitionContext, result any) (router.Screen, any) {
