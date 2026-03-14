@@ -185,6 +185,27 @@ tasks:
       - task: package
     silent: true
 
+  all-64:
+    desc: Build and package for all 64-bit platforms
+    cmds:
+      - task: build
+      - task: extract
+      - task: package-next
+      - task: package-muos
+      - task: package-knulli
+      - task: package-spruce
+      - task: package-rocknix
+      - task: package-trimui
+    silent: true
+
+  all-32:
+    desc: Build and package for all 32-bit platforms
+    cmds:
+      - task: build-32
+      - task: extract-32
+      - task: package-allium
+    silent: true
+
   all-local:
     desc: Build (with local gabagool) and package for all platforms
     cmds:
