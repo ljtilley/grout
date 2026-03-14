@@ -10,18 +10,25 @@
   - **Synced Games Browser**: Browse all synced games grouped by platform, view save details, and manage save slots
   - **Sync Menu**: New dedicated sync menu accessible via `Y` from the main menu
   - **Device Registration**: Device registration is performed when setting up save sync, can change device name anytime in settings (#134)
+- **Batocera Support**: Preliminary support for Batocera CFW (#157) - @from-nibly
+- **Server Settings Reconfiguration**: Reconfigure server host, port, protocol, and SSL verification without logging out (#146)
+- **Flip Face Buttons**: New setting to swap face buttons (A <-> B, X <-> Y) for devices where the layout doesn't match expectations (#153)
 - **Cache Purging**: Local cache now purges deleted items using RomM's new identifier endpoints, keeping the cache in sync with the server more efficiently (#83)
 - **muOS Jacaranda Icon Support**: Grout icons now display correctly on muOS Jacaranda and prior versions - @pawndev
 
 ## Improvements
 
+- **Save Sync Platform Mapping**: Restored save sync platform mapping for manual directory configuration
 - **muOS Splash & Preview Options**: Configuration for downloading screenshot, title, and marquee artwork (#86) - @pawndev
 - **Gamelist.xml Support**: Added miyoogamelist.xml support for Spruce and Allium (#140) - @pawndev
 - **Trimui Stock Save Sync**: Added save directory mappings for Trimui stock OS (#128) - @malkavi
+- Removed state machine from search for cleaner navigation
 - Updated translations across all supported languages (#123)
 
 ## Bug Fixes
 
+- Fixed save mapping for muOS NDS
+- Fixed launch scripts and binaries not being executable in zip files (#155)
 - Fixed Spruce launch script - @pawndev
 - Fixed initial device registration flow
 - Fixed Trimui packaging - @malkavi
@@ -29,10 +36,14 @@
 ## Documentation
 
 - Added Anbernic RG34XX as tested on ROCKNIX - @SethBarberee
+- Added Anbernic RG34XXSP to muOS installation guide
+- Added Anbernic RG CUBE to muOS compatibility list
+- Added RGB30 to ROCKNIX installation guide - @pawndev
+- Updated Knulli tested devices
 
 ## Contributors
 
-Thanks to @pawndev, @malkavi, @SethBarberee, and @ivan for their contributions to this release! :heart:
+Thanks to @pawndev, @from-nibly, @malkavi, @SethBarberee, and @ivan for their contributions to this release! :heart:
 
 ---
 
