@@ -120,8 +120,8 @@ func setup() SetupResult {
 		if config == nil {
 			config = &internal.Config{
 				ShowRegularCollections: true,
-				ApiTimeout:             30 * time.Minute,
-				DownloadTimeout:        60 * time.Minute,
+				ApiTimeout:             internal.DurationSeconds(30 * time.Second),
+				DownloadTimeout:        internal.DurationSeconds(60 * time.Minute),
 			}
 		}
 		config.Language = selectedLanguage
@@ -180,7 +180,7 @@ func setup() SetupResult {
 		screen := ui.NewPlatformMappingScreen()
 		result, err := screen.Draw(ui.PlatformMappingInput{
 			Host:             config.Hosts[0],
-			ApiTimeout:       config.ApiTimeout,
+			ApiTimeout:       config.ApiTimeout.Duration(),
 			CFW:              currentCFW,
 			RomDirectory:     cfw.GetRomDirectory(),
 			AutoSelect:       false,
@@ -247,12 +247,12 @@ func setup() SetupResult {
 			}
 
 			// Step 3: Load platforms
-			if err := config.LoadPlatformsBinding(config.Hosts[0], config.ApiTimeout); err != nil {
+			if err := config.LoadPlatformsBinding(config.Hosts[0], config.ApiTimeout.Duration()); err != nil {
 				logger.Debug("Failed to load platform bindings", "error", err)
 			}
 
 			var err error
-			platforms, err = internal.GetMappedPlatforms(config.Hosts[0], config.DirectoryMappings, config.ApiTimeout)
+			platforms, err = internal.GetMappedPlatforms(config.Hosts[0], config.DirectoryMappings, config.ApiTimeout.Duration())
 			if err != nil {
 				loadErr = err
 				return nil, nil
