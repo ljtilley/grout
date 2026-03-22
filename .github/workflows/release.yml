@@ -74,8 +74,11 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
-      - name: Build and Package
+      - name: Build and Package (64-bit)
         run: task build extract package-next package-muos package-knulli package-spruce package-rocknix package-trimui package-batocera
+
+      - name: Build and Package (32-bit)
+        run: task build-32 extract-32 package-allium package-onion
 
       - name: Create NextUI distribution
         run: |
@@ -109,6 +112,16 @@ jobs:
           cd dist/Trimui
           zip -r ../Grout-Trimui.zip Grout
 
+      - name: Create Allium distribution
+        run: |
+          cd dist/Allium
+          zip -r ../Grout-Allium.zip Grout.pak
+
+      - name: Create Onion distribution
+        run: |
+          cd dist/Onion
+          zip -r ../Grout-Onion.zip Grout
+
       - name: Create Batocera distribution
         run: |
           cd dist/Batocera
@@ -129,6 +142,8 @@ jobs:
             dist/Grout.pak.zip
             dist/Grout.muxapp
             dist/Grout.spruce.zip
+            dist/Grout-Allium.zip
+            dist/Grout-Onion.zip
             dist/Grout-Knulli.zip
             dist/Grout-ROCKNIX.zip
             dist/Grout-Trimui.zip
