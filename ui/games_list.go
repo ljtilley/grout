@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"grout/cache"
 	"grout/internal"
+	"grout/internal/environment"
 	"grout/internal/stringutil"
 	"grout/romm"
 	"slices"
@@ -267,7 +268,11 @@ func (s *GameListScreen) Draw(input GameListInput) (GameListOutput, error) {
 	footerItems = append(footerItems, gaba.FooterHelpItem{ButtonName: "B", HelpText: i18n.Localize(&goi18n.Message{ID: "button_back", Other: "Back"}, nil)})
 
 	if hasBIOS && !internal.IsKidModeEnabled() {
-		footerItems = append(footerItems, gaba.FooterHelpItem{ButtonName: i18n.Localize(&goi18n.Message{ID: "button_menu", Other: "Menu"}, nil), HelpText: i18n.Localize(&goi18n.Message{ID: "button_bios", Other: "BIOS"}, nil)})
+		menuButtonName := i18n.Localize(&goi18n.Message{ID: "button_menu", Other: "Menu"}, nil)
+		if environment.IsMiyoo() {
+			menuButtonName = "L2"
+		}
+		footerItems = append(footerItems, gaba.FooterHelpItem{ButtonName: menuButtonName, HelpText: i18n.Localize(&goi18n.Message{ID: "button_bios", Other: "BIOS"}, nil)})
 	}
 
 	footerItems = append(footerItems, gaba.FooterHelpItem{ButtonName: "Y", HelpText: i18n.Localize(&goi18n.Message{ID: "button_filters", Other: "Filters"}, nil), Group: gaba.FooterGroupRight})

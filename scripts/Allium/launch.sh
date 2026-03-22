@@ -3,6 +3,7 @@ CUR_DIR="$(dirname "$0")"
 cd "$CUR_DIR"/grout || exit 1
 
 export CFW=ALLIUM
+export IS_MIYOO=1
 export LD_LIBRARY_PATH=/mnt/SDCARD/Apps/Grout.pak/grout/lib:$LD_LIBRARY_PATH
 
 export SDL_VIDEODRIVER=mmiyoo
