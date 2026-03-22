@@ -10,8 +10,7 @@ export LD_LIBRARY_PATH=$CUR_DIR/lib:$LD_LIBRARY_PATH
 
 if [ -f "$FLAG_FILE" ]; then
     rm -f "$FLAG_FILE"
-    # batocera-es-swissknife --update-gamelists
-    batocera-es-swissknife --restart
+    nohup bash -c "sleep 3 && batocera-es-swissknife --restart" >/dev/null 2>&1 &
 fi
 
 exit 0

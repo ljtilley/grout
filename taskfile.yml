@@ -88,7 +88,7 @@ tasks:
       - mkdir -p dist/Grout.pak/lib
       - cp build64/grout scripts/NextUI/launch.sh README.md LICENSE pak.json dist/Grout.pak
       - cp -R build64/lib/* dist/Grout.pak/lib/
-      - chmod +x dist/Grout.pak/grout dist/Grout.pak/launch.sh
+      - chmod a+x dist/Grout.pak/grout dist/Grout.pak/launch.sh
     silent: true
 
   package-muos:
@@ -99,7 +99,7 @@ tasks:
       - cp build64/grout scripts/muOS/mux_launch.sh README.md LICENSE dist/muOS/Grout
       - cp -R build64/lib/* dist/muOS/Grout/lib/
       - cp -R scripts/muOS/resources dist/muOS/Grout/
-      - chmod +x dist/muOS/Grout/grout dist/muOS/Grout/mux_launch.sh
+      - chmod a+x dist/muOS/Grout/grout dist/muOS/Grout/mux_launch.sh
       - cd dist/muOS && zip -r ../Grout.muxapp Grout
     silent: true
 
@@ -110,7 +110,7 @@ tasks:
       - mkdir -p dist/Knulli/Grout/lib
       - cp build64/grout scripts/Knulli/Grout.sh scripts/Knulli/logo.png README.md LICENSE dist/Knulli/Grout
       - cp -R build64/lib/* dist/Knulli/Grout/lib/
-      - chmod +x dist/Knulli/Grout/grout dist/Knulli/Grout/Grout.sh
+      - chmod a+x dist/Knulli/Grout/grout dist/Knulli/Grout/Grout.sh
     silent: true
 
   package-spruce:
@@ -121,7 +121,7 @@ tasks:
       - cp scripts/Spruce/* README.md LICENSE dist/Spruce/Grout
       - cp build64/grout dist/Spruce/Grout/grout
       - cp -R build64/lib/* dist/Spruce/Grout/grout/lib/
-      - chmod +x dist/Spruce/Grout/grout/grout dist/Spruce/Grout/launch.sh dist/Spruce/Grout/launch-universal.sh
+      - chmod a+x dist/Spruce/Grout/grout/grout dist/Spruce/Grout/launch.sh dist/Spruce/Grout/launch-universal.sh
     silent: true
 
   package-allium:
@@ -152,7 +152,7 @@ tasks:
       - cp scripts/ROCKNIX/Grout.sh dist/ROCKNIX/
       - cp build64/grout scripts/ROCKNIX/logo.png README.md LICENSE dist/ROCKNIX/Grout/
       - cp -R build64/lib/* dist/ROCKNIX/Grout/lib/
-      - chmod +x dist/ROCKNIX/Grout/grout dist/ROCKNIX/Grout.sh
+      - chmod a+x dist/ROCKNIX/Grout/grout dist/ROCKNIX/Grout.sh
     silent: true
 
   package-trimui:
@@ -163,7 +163,7 @@ tasks:
       - cp scripts/Trimui/* README.md LICENSE dist/Trimui/Grout
       - cp build64/grout dist/Trimui/Grout/grout
       - cp -R build64/lib/* dist/Trimui/Grout/grout/lib/
-      - chmod +x dist/Trimui/Grout/grout/grout dist/Trimui/Grout/launch.sh
+      - chmod a+x dist/Trimui/Grout/grout/grout dist/Trimui/Grout/launch.sh
     silent: true
 
   package-batocera:
@@ -174,7 +174,7 @@ tasks:
       - cp scripts/Batocera/Grout.sh dist/Batocera/
       - cp build64/grout README.md LICENSE dist/Batocera/Grout/
       - cp -R build64/lib/* dist/Batocera/Grout/lib/
-      - chmod +x dist/Batocera/Grout/grout dist/Batocera/Grout.sh
+      - chmod a+x dist/Batocera/Grout/grout dist/Batocera/Grout.sh
     silent: true
 
   batocera-amd64:
@@ -187,7 +187,7 @@ tasks:
       - cp scripts/Batocera/Grout.sh dist/Batocera/
       - cp build/grout README.md LICENSE dist/Batocera/Grout/
       - cp -R build/lib/* dist/Batocera/Grout/lib/
-      - chmod +x dist/Batocera/Grout/grout dist/Batocera/Grout.sh
+      - chmod a+x dist/Batocera/Grout/grout dist/Batocera/Grout.sh
     silent: true
 
   all:
