@@ -642,7 +642,7 @@ func transitionSettings(ctx *transitionContext, result any) (router.Screen, any)
 		ctx.stack.Push(ScreenSettings, pushInput, r)
 		return ScreenPlatformMapping, ui.PlatformMappingInput{
 			Host:             ctx.state.Host,
-			ApiTimeout:       ctx.state.Config.ApiTimeout,
+			ApiTimeout:       ctx.state.Config.ApiTimeout.Duration(),
 			CFW:              ctx.state.CFW,
 			RomDirectory:     cfw.GetRomDirectory(),
 			ExistingMappings: ctx.state.Config.DirectoryMappings,

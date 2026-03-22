@@ -52,7 +52,7 @@ func (s *ArtworkSyncScreen) draw(input ArtworkSyncInput) {
 		platforms, err = cm.GetPlatforms()
 	}
 	if len(platforms) == 0 {
-		client := romm.NewClientFromHost(input.Host, input.Config.ApiTimeout)
+		client := romm.NewClientFromHost(input.Host, input.Config.ApiTimeout.Duration())
 		platforms, err = client.GetPlatforms()
 		if err != nil {
 			logger.Error("Failed to fetch platforms", "error", err)

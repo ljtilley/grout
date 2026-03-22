@@ -392,7 +392,7 @@ func (s *DownloadScreen) buildDownloads(config internal.Config, host romm.Host, 
 			URL:         sourceURL,
 			Location:    downloadLocation,
 			DisplayName: g.Name,
-			Timeout:     config.DownloadTimeout,
+			Timeout:     config.DownloadTimeout.Duration(),
 		})
 
 		if config.DownloadArt && (g.PathCoverLarge != "" || g.PathCoverSmall != "" || g.URLCover != "") {
