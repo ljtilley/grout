@@ -1,6 +1,6 @@
 # Installation Guide for Allium
 
-This guide will help you install Grout on Miyoo Mini devices running [Allium](https://github.com/allium-launcher/allium).
+This guide will help you install Grout on Miyoo Mini devices running [Allium][allium].
 
 ## Tested Devices
 
@@ -40,3 +40,5 @@ file if you do not want to authenticate again, and configure platforms folder ma
 ## Next Steps
 
 After installation is complete, check out the [User Guide](../usage/guide.md) to learn how to use Grout.
+
+--8<-- "docs/_includes/cfw-links.md"

@@ -7,7 +7,7 @@ Get up and running with Grout in five steps.
 Make sure you have:
 
 - A RomM server running and accessible
-- A compatible device running [Allium](https://github.com/allium-launcher/allium), [Batocera](https://batocera.org), [Knulli](https://knulli.org), [muOS](https://muos.dev), [NextUI](https://nextui.loveretro.games), [Onion](https://github.com/OnionUI/Onion), [ROCKNIX](https://rocknix.org), [Spruce v4](https://spruceui.github.io/), or [TrimUI](https://trimui.com)
+- A compatible device running [Allium][allium], [Batocera][batocera], [Knulli][knulli], [muOS][muos], [NextUI][nextui], [Onion][onion], [ROCKNIX][rocknix], [Spruce v4][spruce], or [TrimUI][trimui]
 - Your device connected to Wi-Fi
 
 ---
@@ -72,4 +72,6 @@ That's it! Your game is now on your device.
 A significant amount of time has been spent building Grout.
 
 If you enjoy using Grout and feel inclined to pay it forward, go do something nice for someone!
+
+--8<-- "docs/_includes/cfw-links.md"
 
