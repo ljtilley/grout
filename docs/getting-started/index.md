@@ -7,7 +7,7 @@ Get up and running with Grout in five steps.
 Make sure you have:
 
 - A RomM server running and accessible
-- A compatible device running muOS, Knulli, ROCKNIX, Spruce v4, NextUI, TrimUI, or Batocera
+- A compatible device running Onion, Allium, muOS, Knulli, ROCKNIX, Spruce v4, NextUI, TrimUI, or Batocera
 - Your device connected to Wi-Fi
 
 ---
@@ -18,13 +18,15 @@ Make sure you have:
 
 Choose your platform:
 
-- [muOS Installation](install-muos.md)
+- [Allium Installation](install-allium.md)
+- [Batocera Installation](install-batocera.md)
 - [Knulli Installation](install-knulli.md)
+- [muOS Installation](install-muos.md)
+- [NextUI Installation](install-nextui.md)
+- [Onion Installation](install-onion.md)
 - [ROCKNIX Installation](install-rocknix.md)
 - [Spruce Installation](install-spruce.md)
-- [NextUI Installation](install-nextui.md)
 - [TrimUI Installation](install-trimui.md)
-- [Batocera Installation](install-batocera.md)
 
 ### Step 2: Launch and Select Language
 

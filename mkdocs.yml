@@ -66,6 +66,8 @@ nav:
   - Home: index.md
   - Quick Start:
       - getting-started/index.md
+      - Onion: getting-started/install-onion.md
+      - Allium: getting-started/install-allium.md
       - muOS: getting-started/install-muos.md
       - Knulli: getting-started/install-knulli.md
       - ROCKNIX: getting-started/install-rocknix.md
