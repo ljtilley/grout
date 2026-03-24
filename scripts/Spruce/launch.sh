@@ -53,10 +53,10 @@ case "$PLATFORM" in
 #        export LD_LIBRARY_PATH="/mnt/SDCARD/spruce/bin/python/lib:$LD_LIBRARY_PATH"
 #        export LD_LIBRARY_PATH="/mnt/SDCARD/spruce/miyoomini/lib:$LD_LIBRARY_PATH"
 
-#        export SDL_VIDEODRIVER=mmiyoo
-#        export SDL_AUDIODRIVER=mmiyoo
-#        export EGL_VIDEODRIVER=mmiyoo
-#        export SDL_MMIYOO_DOUBLE_BUFFER=1
+        export SDL_VIDEODRIVER=mmiyoo
+        export SDL_AUDIODRIVER=mmiyoo
+        export EGL_VIDEODRIVER=mmiyoo
+        export SDL_MMIYOO_DOUBLE_BUFFER=1
 
         export IS_MIYOO=1
         export LD_LIBRARY_PATH="/mnt/SDCARD/App/Grout/grout/lib32:$LD_LIBRARY_PATH"
