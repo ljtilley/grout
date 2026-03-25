@@ -35,6 +35,8 @@ func GetAssetName(c cfw.CFW) string {
 			return "grout-arm32"
 		case "amd64":
 			return "grout-amd64"
+		case "386":
+			return "grout-x86"
 		default:
 			return ""
 		}

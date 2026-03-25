@@ -22,6 +22,13 @@ tasks:
       - docker buildx build {{.NO_CACHE}} --load --platform=linux/amd64 --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} -t {{.IMAGE_NAME}}-amd64 -f docker/Dockerfile .
     silent: true
 
+  build-x86:
+    desc: Build for x86 (32-bit)
+    cmds:
+      - rm -rf buildx86
+      - docker buildx build {{.NO_CACHE}} --load --platform=linux/386 --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} -t {{.IMAGE_NAME}}-x86 -f docker/Dockerfile .
+    silent: true
+
   build-32:
     desc: Build for ARM32
     cmds:
@@ -65,6 +72,17 @@ tasks:
       - docker rm {{.CONTAINER_NAME}}
     silent: true
 
+  extract-x86:
+    desc: Extract binary and libraries from x86 Docker image
+    cmds:
+      - mkdir -p buildx86/lib
+      - docker rm {{.CONTAINER_NAME}} 2>/dev/null || true
+      - docker create --name {{.CONTAINER_NAME}} --label {{.LABEL}} {{.IMAGE_NAME}}-x86
+      - docker cp {{.CONTAINER_NAME}}:/build/grout buildx86/grout
+      - docker cp {{.CONTAINER_NAME}}:/usr/lib/i386-linux-gnu/libSDL2_gfx-1.0.so.0.0.2 buildx86/lib/libSDL2_gfx-1.0.so.0
+      - docker rm {{.CONTAINER_NAME}}
+    silent: true
+
   extract-32:
     desc: Extract binary and libraries from Docker image
     cmds:
@@ -78,7 +96,7 @@ tasks:
 
   package:
     desc: Package for all platforms
-    deps: [ package-next, package-muos, package-knulli, package-spruce, package-rocknix, package-trimui, package-allium, package-onion, package-batocera, package-batocera-amd64 ]
+    deps: [ package-next, package-muos, package-knulli, package-spruce, package-rocknix, package-trimui, package-allium, package-onion, package-batocera, package-batocera-x86, package-batocera-amd64 ]
     silent: true
 
   package-next:
@@ -175,6 +193,17 @@ tasks:
       - cp build64/grout README.md LICENSE dist/Batocera-arm64/Grout/
       - cp -R build64/lib/* dist/Batocera-arm64/Grout/lib/
       - chmod a+x dist/Batocera-arm64/Grout/grout dist/Batocera-arm64/Grout.sh
+    silent: true
+
+  package-batocera-x86:
+    desc: Package for Batocera (x86 32-bit)
+    cmds:
+      - rm -rf dist/Batocera-x86
+      - mkdir -p dist/Batocera-x86/Grout/lib
+      - cp scripts/Batocera/Grout.sh dist/Batocera-x86/
+      - cp buildx86/grout README.md LICENSE dist/Batocera-x86/Grout/
+      - cp -R buildx86/lib/* dist/Batocera-x86/Grout/lib/
+      - chmod a+x dist/Batocera-x86/Grout/grout dist/Batocera-x86/Grout.sh
     silent: true
 
   package-batocera-amd64:
@@ -343,7 +372,7 @@ tasks:
   clean:
     desc: Remove build artifacts
     cmds:
-      - rm -rf build64 build32 dist
+      - rm -rf build64 build buildx86 build32 dist
     silent: true
 
   hooks-setup:
