@@ -96,7 +96,7 @@ tasks:
 
   package:
     desc: Package for all platforms
-    deps: [ package-next, package-muos, package-knulli, package-spruce, package-rocknix, package-trimui, package-allium, package-onion, package-batocera, package-batocera-x86, package-batocera-amd64 ]
+    deps: [ package-next, package-muos, package-knulli, package-spruce, package-rocknix, package-trimui, package-allium, package-onion, package-minui, package-minui-arm32, package-batocera, package-batocera-x86, package-batocera-amd64 ]
     silent: true
 
   package-next:
@@ -182,6 +182,26 @@ tasks:
       - cp build64/grout dist/Trimui/Grout/grout
       - cp -R build64/lib/* dist/Trimui/Grout/grout/lib/
       - chmod a+x dist/Trimui/Grout/grout/grout dist/Trimui/Grout/launch.sh
+    silent: true
+
+  package-minui:
+    desc: Package MinUI for ARM64
+    cmds:
+      - rm -rf dist/MinUI-arm64
+      - mkdir -p dist/MinUI-arm64/Grout/lib
+      - cp build64/grout scripts/MinUI/launch.sh README.md LICENSE dist/MinUI-arm64/Grout
+      - cp -R build64/lib/* dist/MinUI-arm64/Grout/lib/
+      - chmod a+x dist/MinUI-arm64/Grout/grout dist/MinUI-arm64/Grout/launch.sh
+    silent: true
+
+  package-minui-arm32:
+    desc: Package MinUI for ARM32
+    cmds:
+      - rm -rf dist/MinUI-arm32
+      - mkdir -p dist/MinUI-arm32/Grout/lib
+      - cp build32/grout scripts/MinUI/launch.sh README.md LICENSE dist/MinUI-arm32/Grout
+      - cp -R vendored/miyoo/* dist/MinUI-arm32/Grout/lib/
+      - chmod a+x dist/MinUI-arm32/Grout/grout dist/MinUI-arm32/Grout/launch.sh
     silent: true
 
   package-batocera:

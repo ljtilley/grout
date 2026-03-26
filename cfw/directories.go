@@ -4,6 +4,7 @@ import (
 	"grout/cfw/allium"
 	"grout/cfw/batocera"
 	"grout/cfw/knulli"
+	"grout/cfw/minui"
 	"grout/cfw/muos"
 	"grout/cfw/nextui"
 	"grout/cfw/onion"
@@ -34,6 +35,8 @@ func GetRomDirectory() string {
 		return onion.GetRomDirectory()
 	case Batocera:
 		return batocera.GetRomDirectory()
+	case MinUI:
+		return minui.GetRomDirectory()
 	}
 	return ""
 }
@@ -41,8 +44,11 @@ func GetRomDirectory() string {
 // RomFolderBase returns the base folder name for ROM matching.
 // tagParser is a function that extracts tags from paths (for NextUI).
 func RomFolderBase(path string, tagParser func(string) string) string {
-	if GetCFW() == NextUI {
+	switch GetCFW() {
+	case NextUI:
 		return nextui.RomFolderBase(path, tagParser)
+	case MinUI:
+		return minui.RomFolderBase(path, tagParser)
 	}
 	return path
 }
@@ -68,14 +74,19 @@ func GetBIOSDirectory() string {
 		return onion.GetBIOSDirectory()
 	case Batocera:
 		return batocera.GetBIOSDirectory()
+	case MinUI:
+		return minui.GetBIOSDirectory()
 	}
 	return ""
 }
 
 // GetBIOSFilePaths returns the BIOS file paths for a given relative path and platform.
 func GetBIOSFilePaths(relativePath string, platformFSSlug string) []string {
-	if GetCFW() == NextUI {
+	switch GetCFW() {
+	case NextUI:
 		return nextui.GetBIOSFilePaths(relativePath, platformFSSlug)
+	case MinUI:
+		return minui.GetBIOSFilePaths(relativePath, platformFSSlug)
 	}
 	return []string{filepath.Join(GetBIOSDirectory(), relativePath)}
 }
@@ -112,6 +123,8 @@ func GetArtDirectory(romDir string, platformFSSlug, platformName string) string 
 		return onion.GetArtDirectory(romDir)
 	case Batocera:
 		return batocera.GetArtDirectory(romDir)
+	case MinUI:
+		return minui.GetArtDirectory(romDir)
 	default:
 		return ""
 	}
@@ -156,6 +169,8 @@ func BaseSavePath() string {
 		return onion.GetBaseSavePath()
 	case Batocera:
 		return batocera.GetBaseSavePath()
+	case MinUI:
+		return minui.GetBaseSavePath()
 	}
 	return ""
 }

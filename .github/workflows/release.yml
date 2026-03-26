@@ -88,7 +88,7 @@ jobs:
         run: task build extract
 
       - name: Package ARM64 platforms
-        run: task package-next package-muos package-knulli package-spruce package-rocknix package-trimui package-batocera
+        run: task package-next package-muos package-knulli package-spruce package-rocknix package-trimui package-minui package-batocera
 
       - name: Rename binary
         run: cp build64/grout build64/grout-arm64
@@ -101,6 +101,7 @@ jobs:
           cd dist/Spruce && zip -r Grout.spruce.zip Grout && mv Grout.spruce.zip ../Grout.spruce.zip && cd ../..
           cd dist/ROCKNIX && zip -r ../Grout-ROCKNIX.zip Grout.sh Grout && cd ../..
           cd dist/Trimui && zip -r ../Grout-Trimui.zip Grout && cd ../..
+          cd dist/MinUI-arm64 && zip -r ../Grout-MinUI-arm64.zip Grout && cd ../..
           cd dist/Batocera-arm64 && zip -r ../Grout-Batocera-arm64.zip Grout.sh Grout && cd ../..
 
       - name: Upload artifacts
@@ -114,6 +115,7 @@ jobs:
             dist/Grout-Knulli.zip
             dist/Grout-ROCKNIX.zip
             dist/Grout-Trimui.zip
+            dist/Grout-MinUI-arm64.zip
             dist/Grout-Batocera-arm64.zip
             build64/grout
             build64/grout-arm64
@@ -221,7 +223,7 @@ jobs:
         run: task build-32 extract-32
 
       - name: Package ARM32 platforms
-        run: task package-allium package-onion
+        run: task package-allium package-onion package-minui-arm32
 
       - name: Rename binary
         run: cp build32/grout build32/grout-arm32
@@ -230,6 +232,7 @@ jobs:
         run: |
           cd dist/Allium && zip -r ../Grout-Allium.zip Grout.pak && cd ../..
           cd dist/Onion && zip -r ../Grout-Onion.zip Grout && cd ../..
+          cd dist/MinUI-arm32 && zip -r ../Grout-MinUI-arm32.zip Grout && cd ../..
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
@@ -238,6 +241,7 @@ jobs:
           path: |
             dist/Grout-Allium.zip
             dist/Grout-Onion.zip
+            dist/Grout-MinUI-arm32.zip
             build32/grout-arm32
 
   release:
@@ -269,6 +273,8 @@ jobs:
             dist/Grout-Knulli.zip
             dist/Grout-ROCKNIX.zip
             dist/Grout-Trimui.zip
+            dist/Grout-MinUI-arm64.zip
+            dist/Grout-MinUI-arm32.zip
             dist/Grout-Batocera-arm64.zip
             dist/Grout-Batocera-x86.zip
             dist/Grout-Batocera-amd64.zip

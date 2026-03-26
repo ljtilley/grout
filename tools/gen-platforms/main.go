@@ -23,6 +23,7 @@ var cfwMapping = map[string]string{
 	"KNULLI":   "knulli",
 	"MUOS":     "muos",
 	"NEXTUI":   "nextui",
+	"MINUI":    "minui",
 	"ONION":    "onion",
 	"ROCKNIX":  "rocknix",
 	"SPRUCE":   "spruce",
