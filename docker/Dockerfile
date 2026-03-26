@@ -41,12 +41,14 @@ RUN if [ "$USE_LOCAL_GABAGOOL" = "true" ]; then \
     fi
 
 ARG GITHUB_ACTIONS=false
+ARG GROUT_VERSION=""
 
 RUN --mount=type=cache,target=/root/.cache/go-build \
     --mount=type=cache,target=/go/pkg/mod \
     BUILD_TYPE="Dev"; \
     if [ "$GITHUB_ACTIONS" = "true" ]; then BUILD_TYPE="Release"; fi; \
-    VERSION=$(jq -r '.version // "dev"' pak.json 2>/dev/null || echo "dev"); \
+    if [ -n "$GROUT_VERSION" ]; then VERSION="$GROUT_VERSION"; \
+    else VERSION=$(jq -r '.version // "dev"' pak.json 2>/dev/null || echo "dev"); fi; \
     GIT_COMMIT=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown"); \
     BUILD_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ); \
     LDFLAGS="-X 'grout/version.Version=$VERSION' \

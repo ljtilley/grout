@@ -5,6 +5,7 @@ vars:
   CONTAINER_NAME: grout-extract
   LABEL: app.romm.grout.build=true
   NO_CACHE: ""
+  VERSION_ARG: '{{if .GROUT_VERSION}}--build-arg GROUT_VERSION={{.GROUT_VERSION}}{{end}}'
 
 tasks:
 
@@ -12,42 +13,42 @@ tasks:
     desc: Build for ARM64
     cmds:
       - rm -rf build64
-      - docker buildx build {{.NO_CACHE}} --platform=linux/arm64 --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} --load -t {{.IMAGE_NAME}} -f docker/Dockerfile .
+      - docker buildx build {{.NO_CACHE}} --platform=linux/arm64 --build-arg GITHUB_ACTIONS=false {{.VERSION_ARG}} --label {{.LABEL}} --load -t {{.IMAGE_NAME}} -f docker/Dockerfile .
     silent: true
 
   build-amd64:
     desc: Build for AMD64 (x86_64)
     cmds:
       - rm -rf build64
-      - docker buildx build {{.NO_CACHE}} --load --platform=linux/amd64 --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} -t {{.IMAGE_NAME}}-amd64 -f docker/Dockerfile .
+      - docker buildx build {{.NO_CACHE}} --load --platform=linux/amd64 --build-arg GITHUB_ACTIONS=false {{.VERSION_ARG}} --label {{.LABEL}} -t {{.IMAGE_NAME}}-amd64 -f docker/Dockerfile .
     silent: true
 
   build-x86:
     desc: Build for x86 (32-bit)
     cmds:
       - rm -rf buildx86
-      - docker buildx build {{.NO_CACHE}} --load --platform=linux/386 --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} -t {{.IMAGE_NAME}}-x86 -f docker/Dockerfile .
+      - docker buildx build {{.NO_CACHE}} --load --platform=linux/386 --build-arg GITHUB_ACTIONS=false {{.VERSION_ARG}} --label {{.LABEL}} -t {{.IMAGE_NAME}}-x86 -f docker/Dockerfile .
     silent: true
 
   build-32:
     desc: Build for ARM32
     cmds:
       - rm -rf build32
-      - docker buildx build {{.NO_CACHE}} --platform=linux/arm/v7 --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} --load -t {{.IMAGE_NAME}} -f docker/32.Dockerfile .
+      - docker buildx build {{.NO_CACHE}} --platform=linux/arm/v7 --build-arg GITHUB_ACTIONS=false {{.VERSION_ARG}} --label {{.LABEL}} --load -t {{.IMAGE_NAME}} -f docker/32.Dockerfile .
     silent: true
 
   build-local:
     desc: Build for ARM64 using local gabagool workspace
     cmds:
       - rm -rf build64
-      - cd .. && docker buildx build {{.NO_CACHE}} --platform=linux/arm64 --build-arg USE_LOCAL_GABAGOOL=true --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} --load -f grout/docker/Dockerfile -t {{.IMAGE_NAME}} .
+      - cd .. && docker buildx build {{.NO_CACHE}} --platform=linux/arm64 --build-arg USE_LOCAL_GABAGOOL=true --build-arg GITHUB_ACTIONS=false {{.VERSION_ARG}} --label {{.LABEL}} --load -f grout/docker/Dockerfile -t {{.IMAGE_NAME}} .
     silent: true
 
   build-32-local:
     desc: Build for ARM32 using local gabagool workspace
     cmds:
       - rm -rf build32
-      - cd .. && docker buildx build {{.NO_CACHE}} --platform=linux/arm/v7 --build-arg USE_LOCAL_GABAGOOL=true --build-arg GITHUB_ACTIONS=false --label {{.LABEL}} --load -f grout/docker/32.Dockerfile -t {{.IMAGE_NAME}} .
+      - cd .. && docker buildx build {{.NO_CACHE}} --platform=linux/arm/v7 --build-arg USE_LOCAL_GABAGOOL=true --build-arg GITHUB_ACTIONS=false {{.VERSION_ARG}} --label {{.LABEL}} --load -f grout/docker/32.Dockerfile -t {{.IMAGE_NAME}} .
     silent: true
 
   extract:

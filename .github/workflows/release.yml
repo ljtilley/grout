@@ -86,6 +86,8 @@ jobs:
 
       - name: Build ARM64
         run: task build extract
+        env:
+          GROUT_VERSION: ${{ needs.prepare.outputs.version }}
 
       - name: Package ARM64 platforms
         run: task package-next package-muos package-knulli package-spruce package-rocknix package-trimui package-minui package-batocera
@@ -135,6 +137,8 @@ jobs:
 
       - name: Build AMD64
         run: task build-amd64 extract-amd64
+        env:
+          GROUT_VERSION: ${{ needs.prepare.outputs.version }}
 
       - name: Package Batocera AMD64
         run: task package-batocera-amd64
@@ -172,6 +176,8 @@ jobs:
 
       - name: Build x86
         run: task build-x86 extract-x86
+        env:
+          GROUT_VERSION: ${{ needs.prepare.outputs.version }}
 
       - name: Package Batocera x86
         run: task package-batocera-x86
@@ -209,6 +215,8 @@ jobs:
 
       - name: Build ARM32
         run: task build-32 extract-32
+        env:
+          GROUT_VERSION: ${{ needs.prepare.outputs.version }}
 
       - name: Package ARM32 platforms
         run: task package-allium package-onion package-minui-arm32
