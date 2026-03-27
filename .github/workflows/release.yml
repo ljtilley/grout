@@ -283,7 +283,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: main
-          token: ${{ secrets.GITHUB_TOKEN }}
+          # token: ${{ secrets.RELEASE_PAT }}  # TODO: uncomment once org approves PAT
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -415,11 +415,3 @@ jobs:
             git commit -m "Update versions.json for ${{ needs.prepare.outputs.version }}"
             git push
           fi
-
-  deploy-docs:
-    needs: update-versions
-    uses: ./.github/workflows/docs.yml
-    permissions:
-      contents: read
-      pages: write
-      id-token: write
