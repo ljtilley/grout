@@ -126,7 +126,8 @@ type RomFile struct {
 type GetRomsQuery struct {
 	Offset              int    `qs:"offset,omitempty"`
 	Limit               int    `qs:"limit,omitempty"`
-	PlatformID          int    `qs:"platform_id,omitempty"`
+	PlatformID   		int    `qs:"platform_id,omitempty"`  // Keep for backwards compatibility
+	PlatformIDs  		[]int  `qs:"platform_ids,omitempty"` // Add this for newer RomM versions
 	CollectionID        int    `qs:"collection_id,omitempty"`
 	SmartCollectionID   int    `qs:"smart_collection_id,omitempty"`
 	VirtualCollectionID string `qs:"virtual_collection_id,omitempty"`

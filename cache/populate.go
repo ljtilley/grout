@@ -188,7 +188,8 @@ func (cm *Manager) fetchPlatformGames(platform romm.Platform, opts *fetchOpts) e
 
 	for {
 		q := romm.GetRomsQuery{
-			PlatformID:   platform.ID,
+			PlatformID:   platform.ID,               // Older RomM instances
+			PlatformIDs:  []int{platform.ID},        // Newer RomM instances
 			Offset:       offset,
 			Limit:        DefaultRomPageSize,
 			UpdatedAfter: opts.updatedAfter,
