@@ -143,6 +143,8 @@ tasks:
       - cp build32/grout dist/Spruce/Grout/grout/grout32
       - cp -R build64/lib/* dist/Spruce/Grout/grout/lib64/
       - cp -R vendored/miyoo/* dist/Spruce/Grout/grout/lib32/miyoo/
+      - cp vendored/miyoo/libSDL2_ttf-2.0.so dist/Spruce/Grout/grout/lib32/a30/
+      - cp vendored/miyoo/libSDL2_ttf-2.0.so.0 dist/Spruce/Grout/grout/lib32/a30/
       - cp -R vendored/a30/* dist/Spruce/Grout/grout/lib32/a30/
       - chmod a+x dist/Spruce/Grout/grout/grout32 dist/Spruce/Grout/grout/grout64 dist/Spruce/Grout/launch.sh
     silent: true

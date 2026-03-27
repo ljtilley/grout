@@ -17,11 +17,12 @@ case "$PLATFORM" in
 ############################################################
     "A30" )
         echo "A30 detected, setting up environment variables for SDL2"
-#        export LD_LIBRARY_PATH="/mnt/SDCARD/spruce/a30/sdl2:$LD_LIBRARY_PATH"
+        export LD_LIBRARY_PATH="/mnt/SDCARD/spruce/a30/sdl2:$LD_LIBRARY_PATH"
         # TODO: try to keep miyoo, but add the subdirectory `sdl2` like in the spruce a30
         # so... even If i take the content of the spruce a30/sdl2 folder, it does not launch
         # I really don't understand why
 #        export LD_LIBRARY_PATH="$CUR_DIR/grout/lib32/miyoo:$LD_LIBRARY_PATH"
+        export LD_LIBRARY_PATH="$CUR_DIR/grout/lib32/a30:$LD_LIBRARY_PATH"
         export SPRUCE_DEVICE="A30"
 
         ./grout32

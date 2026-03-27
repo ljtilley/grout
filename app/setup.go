@@ -66,12 +66,17 @@ func setup() SetupResult {
 	if preConfig, err := internal.LoadConfig(); err == nil {
 		gaba.SetFlipFaceButtons(preConfig.SwapFaceButtons)
 	}
+	orientation := gaba.OrientationNormal
+	if currentCFW == cfw.Spruce && spruce.DetectDevice() == spruce.DeviceA30 {
+		orientation = gaba.OrientationRotate270
+	}
 
 	gaba.Init(gaba.Options{
 		WindowTitle:          "Grout",
 		PrimaryThemeColorHex: 0x007C77,
 		ShowBackground:       true,
 		IsNextUI:             currentCFW == cfw.NextUI,
+		DisplayOrientation:   orientation,
 	})
 
 	gaba.RegisterChord("unlock-kid-mode", []buttons.VirtualButton{
