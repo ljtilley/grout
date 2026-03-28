@@ -347,8 +347,6 @@ func classifyStartupError(err error) *goi18n.Message {
 		return &goi18n.Message{ID: "startup_error_connection_refused", Other: "Could not connect to RomM!\nPlease check the server is running."}
 	case errors.Is(err, romm.ErrTimeout):
 		return &goi18n.Message{ID: "startup_error_timeout", Other: "Connection timed out!\nPlease check your network connection."}
-	case errors.Is(err, romm.ErrWrongProtocol):
-		return &goi18n.Message{ID: "startup_error_wrong_protocol", Other: "Protocol mismatch!\nCheck your server configuration."}
 	case errors.Is(err, romm.ErrUnauthorized):
 		return &goi18n.Message{ID: "startup_error_credentials", Other: "Invalid credentials!\nPlease check your username and password."}
 	case errors.Is(err, romm.ErrForbidden):

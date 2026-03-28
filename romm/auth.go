@@ -1,7 +1,6 @@
 package romm
 
 import (
-	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -32,31 +31,9 @@ func (c *Client) ValidateConnection() error {
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		classifiedErr := ClassifyError(fmt.Errorf("failed to connect: %w", err))
-
-		shouldTryProtocolSwitch := !errors.Is(classifiedErr, ErrTimeout) &&
-			!errors.Is(classifiedErr, ErrConnectionRefused) &&
-			!errors.Is(classifiedErr, ErrInvalidHostname)
-
-		if shouldTryProtocolSwitch {
-			if protocolErr := c.tryAlternateProtocol(req.URL.Scheme, func(r *http.Response) bool {
-				return r.StatusCode >= 200 && r.StatusCode < 300
-			}); protocolErr != nil {
-				return protocolErr
-			}
-		}
-
-		return classifiedErr
+		return ClassifyError(fmt.Errorf("failed to connect: %w", err))
 	}
 	defer resp.Body.Close()
-
-	if req.URL.Scheme != resp.Request.URL.Scheme {
-		return &ProtocolError{
-			RequestedProtocol: req.URL.Scheme,
-			CorrectProtocol:   resp.Request.URL.Scheme,
-			Err:               ErrWrongProtocol,
-		}
-	}
 
 	switch {
 	case resp.StatusCode >= 200 && resp.StatusCode < 300:
@@ -70,11 +47,6 @@ func (c *Client) ValidateConnection() error {
 		}
 	default:
 		logResponseDebug("ValidateConnection: unexpected status", resp)
-		if protocolErr := c.tryAlternateProtocol(req.URL.Scheme, func(r *http.Response) bool {
-			return r.StatusCode >= 200 && r.StatusCode < 300
-		}); protocolErr != nil {
-			return protocolErr
-		}
 		return fmt.Errorf("heartbeat check failed with status: %d", resp.StatusCode)
 	}
 }
@@ -106,11 +78,6 @@ func (c *Client) Login(username, password string) error {
 		return &AuthError{StatusCode: 403, Message: "Access forbidden", Err: ErrForbidden}
 	case resp.StatusCode >= 500:
 		return &AuthError{StatusCode: resp.StatusCode, Message: "Server error", Err: ErrServerError}
-	case resp.StatusCode == 405:
-		if protocolErr := c.tryAlternateProtocolForLogin(req, username, password); protocolErr != nil {
-			return protocolErr
-		}
-		return fmt.Errorf("login failed with status: %d", resp.StatusCode)
 	default:
 		return fmt.Errorf("login failed with status: %d", resp.StatusCode)
 	}
@@ -137,75 +104,9 @@ func (c *Client) GetCurrentUser() (CurrentUser, error) {
 	return user, err
 }
 
-func switchProtocol(baseURL string) string {
-	if len(baseURL) > 8 && baseURL[:8] == "https://" {
-		return "http://" + baseURL[8:]
-	}
-	if len(baseURL) > 7 && baseURL[:7] == "http://" {
-		return "https://" + baseURL[7:]
-	}
-	return baseURL
-}
-
-func (c *Client) tryAlternateProtocol(originalScheme string, isSuccess func(resp *http.Response) bool) *ProtocolError {
-	switchedURL := switchProtocol(c.baseURL)
-	if switchedURL == c.baseURL {
-		return nil
-	}
-
-	testReq, err := http.NewRequest("GET", switchedURL+endpointHeartbeat, nil)
-	if err != nil {
-		return nil
-	}
-
-	testResp, err := c.httpClient.Do(testReq)
-	if err != nil {
-		return nil
-	}
-	defer testResp.Body.Close()
-
-	if isSuccess(testResp) {
-		return &ProtocolError{
-			RequestedProtocol: originalScheme,
-			CorrectProtocol:   testReq.URL.Scheme,
-			Err:               ErrWrongProtocol,
-		}
-	}
-	return nil
-}
-
-func (c *Client) tryAlternateProtocolForLogin(originalReq *http.Request, username, password string) *ProtocolError {
-	switchedURL := switchProtocol(c.baseURL)
-	if switchedURL == c.baseURL {
-		return nil
-	}
-
-	testClient := NewClient(switchedURL, WithTimeout(c.httpClient.Timeout))
-	testReq, err := http.NewRequest("POST", switchedURL+endpointLogin, nil)
-	if err != nil {
-		return nil
-	}
-	testReq.SetBasicAuth(username, password)
-
-	testResp, err := testClient.httpClient.Do(testReq)
-	if err != nil {
-		return nil
-	}
-	defer testResp.Body.Close()
-
-	if testResp.StatusCode != 405 && testResp.StatusCode < 500 {
-		return &ProtocolError{
-			RequestedProtocol: originalReq.URL.Scheme,
-			CorrectProtocol:   testReq.URL.Scheme,
-			Err:               ErrWrongProtocol,
-		}
-	}
-	return nil
-}
-
 func logResponseDebug(label string, resp *http.Response) {
 	logger := gaba.GetLogger()
-	body, _ := io.ReadAll(resp.Body)
+	body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
 
 	headers := make(map[string]string)
 	for k, v := range resp.Header {

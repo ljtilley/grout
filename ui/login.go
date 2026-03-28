@@ -420,20 +420,6 @@ func classifyLoginError(err error) loginAttemptResult {
 		return loginAttemptResult{Success: true}
 	}
 
-	var protocolErr *romm.ProtocolError
-	if errors.As(err, &protocolErr) {
-		if protocolErr.CorrectProtocol == "https" {
-			return loginAttemptResult{
-				ErrorType: "protocol",
-				ErrorMsg:  &goi18n.Message{ID: "login_error_use_https", Other: "Protocol mismatch!\nPlease use HTTPS instead of HTTP."},
-			}
-		}
-		return loginAttemptResult{
-			ErrorType: "protocol",
-			ErrorMsg:  &goi18n.Message{ID: "login_error_use_http", Other: "Protocol mismatch!\nPlease use HTTP instead of HTTPS."},
-		}
-	}
-
 	switch {
 	case errors.Is(err, romm.ErrInvalidHostname):
 		return loginAttemptResult{
@@ -449,11 +435,6 @@ func classifyLoginError(err error) loginAttemptResult {
 		return loginAttemptResult{
 			ErrorType: "timeout",
 			ErrorMsg:  &goi18n.Message{ID: "login_error_timeout", Other: "Connection timed out!\nPlease check your network connection and that the host is reachable."},
-		}
-	case errors.Is(err, romm.ErrWrongProtocol):
-		return loginAttemptResult{
-			ErrorType: "protocol",
-			ErrorMsg:  &goi18n.Message{ID: "login_error_wrong_protocol", Other: "Protocol mismatch!\nTry switching between http and https."},
 		}
 	case errors.Is(err, romm.ErrUnauthorized):
 		return loginAttemptResult{
