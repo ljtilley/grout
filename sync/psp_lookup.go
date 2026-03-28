@@ -24,20 +24,36 @@ func loadPSPGameDB() map[string]string {
 }
 
 // LookupPSPTitle resolves a PPSSPP save folder name to a game title.
-// Folder names are typically in the format "UCUS98662_GameData0" or just "UCUS98662".
-// Returns the title and true if found, or empty string and false if not.
+// Folder names vary in format:
+//   - "UCUS98662_GameData0" (underscore-separated suffix)
+//   - "ULUS10088010000" (save slot appended directly)
+//   - "UCUS98662" (plain Game ID)
+//
+// The standard Game ID is 4 letters + 5 digits (9 chars). The function
+// tries an underscore split first, then extracts the 9-char prefix.
 func LookupPSPTitle(folderName string) (string, bool) {
 	db := loadPSPGameDB()
 
-	// Strip common suffixes like _GameData0, _DATA, etc.
-	gameID := folderName
+	gameID := strings.ReplaceAll(folderName, "-", "")
+
+	// Try underscore split first (e.g., UCUS98662_GameData0)
 	if idx := strings.Index(gameID, "_"); idx > 0 {
-		gameID = gameID[:idx]
+		if title, ok := db[gameID[:idx]]; ok {
+			return title, true
+		}
 	}
 
-	// Normalize: remove dashes
-	gameID = strings.ReplaceAll(gameID, "-", "")
+	// Try standard 9-char Game ID prefix (e.g., ULUS10088 from ULUS10088010000)
+	if len(gameID) >= 9 {
+		if title, ok := db[gameID[:9]]; ok {
+			return title, true
+		}
+	}
 
-	title, ok := db[gameID]
-	return title, ok
+	// Try exact match as fallback
+	if title, ok := db[gameID]; ok {
+		return title, true
+	}
+
+	return "", false
 }
