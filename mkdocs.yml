@@ -69,6 +69,7 @@ nav:
       - Allium: getting-started/install-allium.md
       - Batocera: getting-started/install-batocera.md
       - Knulli: getting-started/install-knulli.md
+      - MinUI: getting-started/install-minui.md
       - muOS: getting-started/install-muos.md
       - NextUI: getting-started/install-nextui.md
       - Onion: getting-started/install-onion.md
@@ -83,6 +84,7 @@ nav:
           - Allium: platforms/allium.md
           - Batocera: platforms/BATOCERA.md
           - Knulli: platforms/knulli.md
+          - MinUI: platforms/minui.md
           - muOS: platforms/muos.md
           - NextUI: platforms/nextui.md
           - Onion: platforms/onion.md

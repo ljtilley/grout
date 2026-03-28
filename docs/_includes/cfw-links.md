@@ -1,6 +1,7 @@
 [allium]: https://github.com/goweiwen/Allium
 [batocera]: https://batocera.org
 [knulli]: https://knulli.org
+[minui]: https://github.com/shauninman/MinUI
 [muos]: https://muos.dev
 [nextui]: https://nextui.loveretro.games
 [onion]: https://onionui.github.io

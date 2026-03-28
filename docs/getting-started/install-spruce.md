@@ -6,13 +6,13 @@ This guide will help you install Grout on devices running [Spruce][spruce] v4.
 
 Grout has been tested on the following devices running Spruce:
 
-| Manufacturer | Device    | Compatibility |
-|--------------|-----------|---------------|
-| TrimUI       | Brick     | Yes           |
-| TrimUI       | Smart Pro | Yes           |
-| Miyoo        | Flip V2   | Yes           |
-| Miyoo        | Mini Flip | Yes           |
-| Miyoo        | A30       | Yes           |
+| Manufacturer | Device    |
+|--------------|-----------|
+| Miyoo        | A30       |
+| Miyoo        | Flip      |
+| Miyoo        | Mini Flip |
+| TrimUI       | Brick     |
+| TrimUI       | Smart Pro |
 
 ## Prerequisites
 

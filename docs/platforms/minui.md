@@ -1,4 +1,6 @@
-# MinUI Platform Mappings
+# MinUI
+
+## Platform Mappings
 
 This table shows the mappings of RomM Fs Slug to MinUI's platform folders.
 
