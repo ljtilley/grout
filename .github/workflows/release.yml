@@ -97,7 +97,6 @@ jobs:
           cd dist/Grout.pak && zip -r ../Grout.pak.zip . && cd ../..
           cd dist/muOS && zip -r Grout.muxapp Grout && mv Grout.muxapp ../Grout.muxapp && cd ../..
           cd dist/Knulli && zip -r ../Grout-Knulli.zip Grout && cd ../..
-          cd dist/Spruce && zip -r Grout.spruce.zip Grout && mv Grout.spruce.zip ../Grout.spruce.zip && cd ../..
           cd dist/ROCKNIX && zip -r ../Grout-ROCKNIX.zip Grout.sh Grout && cd ../..
           cd dist/Trimui && zip -r ../Grout-Trimui.zip Grout && cd ../..
           cd dist/MinUI-arm64 && zip -r ../Grout-MinUI-arm64.zip Grout && cd ../..
@@ -110,13 +109,13 @@ jobs:
           path: |
             dist/Grout.pak.zip
             dist/Grout.muxapp
-            dist/Grout.spruce.zip
             dist/Grout-Knulli.zip
             dist/Grout-ROCKNIX.zip
             dist/Grout-Trimui.zip
             dist/Grout-MinUI-arm64.zip
             dist/Grout-Batocera-arm64.zip
             build64/grout
+            build64/lib/**
 
   build-amd64:
     needs: prepare
@@ -235,6 +234,7 @@ jobs:
             dist/Grout-Allium.zip
             dist/Grout-Onion.zip
             dist/Grout-MinUI-arm32.zip
+            build32/grout
   package-arm-universal:
     needs: [prepare, build-arm64, build-arm32]
     runs-on: ubuntu-22.04
@@ -248,6 +248,16 @@ jobs:
         with:
           version: 3.x
           repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Download ARM64 build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: arm64-artifacts
+
+      - name: Download ARM32 build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: arm32-artifacts
 
       - name: Package universal assets
         run: task package:spruce
