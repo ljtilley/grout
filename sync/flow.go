@@ -141,9 +141,9 @@ func ScanSaves(config *internal.Config) []LocalSave {
 						continue
 					}
 
-					title, found := LookupPSPTitle(entry.Name())
+					title, found := ReadPSPSaveTitle(filepath.Join(saveDir, entry.Name()))
 					if !found {
-						logger.Debug("No GameDB match for save directory", "dir", entry.Name(), "fsSlug", rommFSSlug)
+						logger.Debug("No PARAM.SFO found in save directory", "dir", entry.Name(), "fsSlug", rommFSSlug)
 						continue
 					}
 
