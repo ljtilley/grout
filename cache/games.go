@@ -714,6 +714,42 @@ func (f GameFilter) HasActiveFilters() bool {
 		f.MinSizeBytes > 0 || f.MaxSizeBytes > 0
 }
 
+// appendJunctionFilters appends EXISTS subqueries for junction table filtering.
+// jtAlias and ltAlias differentiate SQL aliases when the outer query already uses "jt"/"lt".
+func appendJunctionFilters(query string, args []any, filter GameFilter, jtAlias, ltAlias string) (string, []any) {
+	type junctionFilter struct {
+		junctionTable, fkCol, lookupTable string
+		values                            []string
+	}
+	junctions := []junctionFilter{
+		{"game_genres", "genre_id", "genres", filter.Genres},
+		{"game_franchises", "franchise_id", "franchises", filter.Franchises},
+		{"game_companies", "company_id", "companies", filter.Companies},
+		{"game_game_modes", "game_mode_id", "game_modes", filter.GameModes},
+		{"game_age_ratings", "age_rating_id", "age_ratings", filter.AgeRatings},
+		{"game_regions", "region_id", "regions", filter.Regions},
+		{"game_languages", "language_id", "languages", filter.Languages},
+		{"game_tags", "tag_id", "tags", filter.Tags},
+	}
+
+	for _, jf := range junctions {
+		if len(jf.values) == 0 {
+			continue
+		}
+		placeholders := make([]string, len(jf.values))
+		for i, v := range jf.values {
+			placeholders[i] = "?"
+			args = append(args, v)
+		}
+		query += " AND EXISTS (SELECT 1 FROM " + jf.junctionTable + " " + jtAlias +
+			" INNER JOIN " + jf.lookupTable + " " + ltAlias +
+			" ON " + ltAlias + ".id = " + jtAlias + "." + jf.fkCol +
+			" WHERE " + jtAlias + ".game_id = g.id AND " + ltAlias + ".name IN (" + strings.Join(placeholders, ",") + "))"
+	}
+
+	return query, args
+}
+
 // GetFilteredGames returns games matching all the given filter criteria.
 // Results are always deserialized from data_json for full Rom objects.
 func (cm *Manager) GetFilteredGames(filter GameFilter) ([]romm.Rom, error) {
@@ -799,33 +835,7 @@ func (cm *Manager) GetFilteredGames(filter GameFilter) ([]romm.Rom, error) {
 		args = append(args, filter.MaxSizeBytes)
 	}
 
-	// Junction table filters using EXISTS subqueries through normalized lookup tables
-	type junctionFilter struct {
-		junctionTable, fkCol, lookupTable string
-		values                            []string
-	}
-	junctions := []junctionFilter{
-		{"game_genres", "genre_id", "genres", filter.Genres},
-		{"game_franchises", "franchise_id", "franchises", filter.Franchises},
-		{"game_companies", "company_id", "companies", filter.Companies},
-		{"game_game_modes", "game_mode_id", "game_modes", filter.GameModes},
-		{"game_age_ratings", "age_rating_id", "age_ratings", filter.AgeRatings},
-		{"game_regions", "region_id", "regions", filter.Regions},
-		{"game_languages", "language_id", "languages", filter.Languages},
-		{"game_tags", "tag_id", "tags", filter.Tags},
-	}
-
-	for _, jf := range junctions {
-		if len(jf.values) == 0 {
-			continue
-		}
-		placeholders := make([]string, len(jf.values))
-		for i, v := range jf.values {
-			placeholders[i] = "?"
-			args = append(args, v)
-		}
-		query += " AND EXISTS (SELECT 1 FROM " + jf.junctionTable + " jt INNER JOIN " + jf.lookupTable + " lt ON lt.id = jt." + jf.fkCol + " WHERE jt.game_id = g.id AND lt.name IN (" + strings.Join(placeholders, ",") + "))"
-	}
+	query, args = appendJunctionFilters(query, args, filter, "jt", "lt")
 
 	query += " ORDER BY g.name"
 
@@ -939,32 +949,7 @@ func (cm *Manager) GetDistinctValuesWithFilter(lookupTable, junctionTable, fkCol
 		args = append(args, "%"+filter.NameSearch+"%")
 	}
 
-	type junctionFilter struct {
-		junctionTable, fkCol, lookupTable string
-		values                            []string
-	}
-	junctions := []junctionFilter{
-		{"game_genres", "genre_id", "genres", filter.Genres},
-		{"game_franchises", "franchise_id", "franchises", filter.Franchises},
-		{"game_companies", "company_id", "companies", filter.Companies},
-		{"game_game_modes", "game_mode_id", "game_modes", filter.GameModes},
-		{"game_age_ratings", "age_rating_id", "age_ratings", filter.AgeRatings},
-		{"game_regions", "region_id", "regions", filter.Regions},
-		{"game_languages", "language_id", "languages", filter.Languages},
-		{"game_tags", "tag_id", "tags", filter.Tags},
-	}
-
-	for _, jf := range junctions {
-		if len(jf.values) == 0 {
-			continue
-		}
-		placeholders := make([]string, len(jf.values))
-		for i, v := range jf.values {
-			placeholders[i] = "?"
-			args = append(args, v)
-		}
-		query += " AND EXISTS (SELECT 1 FROM " + jf.junctionTable + " jt2 INNER JOIN " + jf.lookupTable + " lt2 ON lt2.id = jt2." + jf.fkCol + " WHERE jt2.game_id = g.id AND lt2.name IN (" + strings.Join(placeholders, ",") + "))"
-	}
+	query, args = appendJunctionFilters(query, args, filter, "jt2", "lt2")
 
 	query += " ORDER BY lt.name"
 
@@ -1015,32 +1000,7 @@ func (cm *Manager) GetCollectionPlatforms(collection romm.Collection, filter Gam
 		args = append(args, "%"+filter.NameSearch+"%")
 	}
 
-	type junctionFilter struct {
-		junctionTable, fkCol, lookupTable string
-		values                            []string
-	}
-	junctions := []junctionFilter{
-		{"game_genres", "genre_id", "genres", filter.Genres},
-		{"game_franchises", "franchise_id", "franchises", filter.Franchises},
-		{"game_companies", "company_id", "companies", filter.Companies},
-		{"game_game_modes", "game_mode_id", "game_modes", filter.GameModes},
-		{"game_age_ratings", "age_rating_id", "age_ratings", filter.AgeRatings},
-		{"game_regions", "region_id", "regions", filter.Regions},
-		{"game_languages", "language_id", "languages", filter.Languages},
-		{"game_tags", "tag_id", "tags", filter.Tags},
-	}
-
-	for _, jf := range junctions {
-		if len(jf.values) == 0 {
-			continue
-		}
-		placeholders := make([]string, len(jf.values))
-		for i, v := range jf.values {
-			placeholders[i] = "?"
-			args = append(args, v)
-		}
-		query += " AND EXISTS (SELECT 1 FROM " + jf.junctionTable + " jt INNER JOIN " + jf.lookupTable + " lt ON lt.id = jt." + jf.fkCol + " WHERE jt.game_id = g.id AND lt.name IN (" + strings.Join(placeholders, ",") + "))"
-	}
+	query, args = appendJunctionFilters(query, args, filter, "jt", "lt")
 
 	query += " ORDER BY p.name"
 
