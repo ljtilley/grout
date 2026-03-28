@@ -514,18 +514,6 @@ other = "接続がタイムアウトしました！\nネットワーク接続と
 hash = "sha1-ace03493e157dc23f826e53e42c88f314817969c"
 other = "予期しないエラーが発生しました！\n詳細はログを確認してください。"
 
-[login_error_use_http]
-hash = "sha1-593a941bb52f07818d18c80753458f0098f8b127"
-other = "プロトコルエラー！\nHTTPSではなくHTTPを使用してください。"
-
-[login_error_use_https]
-hash = "sha1-ba5d2ee917a10fd2a4eb4cebc6cd8e2f51deb7ff"
-other = "プロトコルエラー！\nHTTPではなくHTTPSを使用してください。"
-
-[login_error_wrong_protocol]
-hash = "sha1-29077cfd4a67af5be709fcec73258057c2992e77"
-other = "プロトコルエラー！\nhttpとhttpsを切り替えてみてください。"
-
 [login_hostname]
 hash = "sha1-c983a1551dcbdb6f0ce43637e89a8726577d4f4b"
 other = "ホスト名"
@@ -973,10 +961,6 @@ other = "接続がタイムアウトしました！\nネットワーク接続を
 [startup_error_token_invalid]
 hash = "sha1-24065b3c24c0b35e98e5048c65a31edba5a60781"
 other = "Your API token is invalid or expired.\nPlease set up a new one."
-
-[startup_error_wrong_protocol]
-hash = "sha1-7c33b76e305eaf2db987d02472b4e0f2e4d896f8"
-other = "プロトコルエラー！\nサーバー設定を確認してください。"
 
 [sync_history_col_game]
 hash = "sha1-e3e82846c32567811615378f30240185871e08e5"

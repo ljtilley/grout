@@ -18,7 +18,6 @@ type AutoUpdate struct {
 	icon            *gaba.DynamicStatusBarIcon
 	running         atomic.Bool
 	updateAvailable atomic.Bool
-	done            chan struct{}
 	mu              sync.Mutex
 	releaseChannel  internal.ReleaseChannel
 	updateInfo      atomic.Pointer[Info]
@@ -29,8 +28,7 @@ func NewAutoUpdate(c cfw.CFW, r internal.ReleaseChannel, host *romm.Host) *AutoU
 		cfwType:        c,
 		releaseChannel: r,
 		host:           host,
-		icon:           gaba.NewDynamicStatusBarIcon(""), // Start empty, will show icon if update available
-		done:           make(chan struct{}),
+		icon:           gaba.NewDynamicStatusBarIcon(""),
 	}
 }
 
@@ -41,8 +39,12 @@ func (a *AutoUpdate) Icon() gaba.StatusBarIcon {
 }
 
 func (a *AutoUpdate) Start() {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if a.running.Load() {
+		return
+	}
 	a.running.Store(true)
-	a.done = make(chan struct{})
 	go a.run()
 }
 
@@ -78,10 +80,7 @@ func (a *AutoUpdate) Recheck(releaseChannel internal.ReleaseChannel) {
 
 func (a *AutoUpdate) run() {
 	logger := gaba.GetLogger()
-	defer func() {
-		a.running.Store(false)
-		close(a.done)
-	}()
+	defer a.running.Store(false)
 
 	logger.Debug("AutoUpdate: Checking for updates in background")
 

@@ -8,7 +8,10 @@
 # Build
 build64/
 build32/
+build/
+buildx86/
 dist/
+*.log
 build-miyoo/
 grout
 app/app
